@@ -2,4 +2,5 @@
 	import { page } from '$app/state';
 </script>
 
-<p>{JSON.stringify(page.data)}</p>
+<p>Coming Soon</p>
+<!-- <p>{JSON.stringify(page.data)}</p> -->

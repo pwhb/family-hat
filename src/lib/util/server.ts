@@ -7,3 +7,10 @@ export const checkAuth = (request: Request) => {
 	}
 	return ROOT_TOKEN === token;
 };
+
+export function serializeDoc<T extends { _id: any }>(doc: T) {
+	return {
+		...doc,
+		_id: doc._id.toString()
+	};
+}

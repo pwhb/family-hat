@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { updateLocalStorage } from '$lib/common';
+	import { updateLocalStorage } from '$lib/util/client';
 	import { langStore } from '$lib/store/lang';
 	const { config } = page.data;
 </script>

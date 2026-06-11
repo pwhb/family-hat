@@ -21,3 +21,4 @@ export const getToken = (request: Request) => {
 	}
 	return auth.split(' ')[1];
 };
+

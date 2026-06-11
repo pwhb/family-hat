@@ -2,6 +2,7 @@
 
 @plugin 'daisyui';
 
+@source inline('bg-{red,blue,green}-{200,400,500,600}');
 body {
 	font-family: 'Noto Serif Myanmar', serif;
 	font-style: normal;

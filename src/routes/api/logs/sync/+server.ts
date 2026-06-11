@@ -1,20 +1,13 @@
 import { DB_NAME } from '$env/static/private';
-import { getToken } from '$lib/common';
+import { getToken } from '$lib/util/client';
 import clientPromise from '$lib/db';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
-
-export const GET: RequestHandler = async ({}) => {
-	const client = await clientPromise;
-	const col = client.db(DB_NAME).collection('logs');
-	const data = await col.find({}).toArray();
-	return json({ data });
-};
+import { json, type RequestHandler } from '@sveltejs/kit';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json();
 	const token = getToken(request);
 	if (!token) {
-		throw error(401, 'Unauthorized');
+		return json({ message: 'Unauthorized' }, { status: 401 });
 	}
 	const client = await clientPromise;
 	const col = client.db(DB_NAME).collection('logs');

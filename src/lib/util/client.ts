@@ -1,6 +1,6 @@
 
-export const getToken = (request: Request) => {
-	const auth = request.headers.get('authorization');
+export const getToken = (request: Request, header = 'authorization') => {
+	const auth = request.headers.get(header);
 	if (!auth) {
 		return null;
 	}

@@ -1,12 +1,14 @@
-import { APP_ID, DB_NAME } from '$env/static/private';
+import { APP_ID, DB_NAME, MODE } from '$env/static/private';
 import { checkAuth } from '$lib/util/server';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Filter } from 'mongodb';
+import { hash } from 'bcrypt';
 
 export const GET: RequestHandler = async ({ params, request, url }) => {
 	try {
-		if (!checkAuth(request)) {
+		const authenticated = await checkAuth(request)
+		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
 		if (!params.slug) {
@@ -51,16 +53,19 @@ export const GET: RequestHandler = async ({ params, request, url }) => {
 
 export const POST: RequestHandler = async ({ request, params }) => {
 	try {
-		if (!checkAuth(request)) {
+		const authenticated = await checkAuth(request)
+		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
 		if (!params.slug) {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
+		if (params.slug === 'users' && MODE !== 'dev') {
+			return json({ message: 'Forbidden' }, { status: 403 });
+		}
 		const body = await request.json();
 		const client = await clientPromise;
 		const col = client.db(DB_NAME).collection(params.slug);
-
 		if (params.slug === 'members') {
 			// members
 			body.code = body.name.en.replace(/\s/g, '_').toUpperCase();
@@ -74,17 +79,23 @@ export const POST: RequestHandler = async ({ request, params }) => {
 		} else if (params.slug === 'relation_types') {
 			// relation types
 			body.code = `${body.fromLabel.en.replace(/\s/g, '_').toUpperCase()}_${body.toLabel.en.replace(/\s/g, '_').toUpperCase()}`;
+		} else if (params.slug === 'users') {
+			body.hashedPassword = await hash(body.password, 10)
+			body.code = body.name.replace(/\s/g, '_').toUpperCase();
+			delete body.password
 		}
 
 		const data = await col.insertOne({
 			...body,
 			isActive: true,
 			appId: APP_ID,
+			createdBy: authenticated._id,
 			createdAt: new Date(),
 			updatedAt: new Date()
 		});
 		return json({ data });
 	} catch (error) {
+		console.log(error);
 		if (error instanceof MongoServerError) {
 			if (error.code === 11000) {
 				return json({ message: 'Duplicate Key Error' }, { status: 409 });

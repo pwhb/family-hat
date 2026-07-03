@@ -6,7 +6,8 @@ import { ObjectId } from 'mongodb';
 
 export const GET: RequestHandler = async ({ request, params }) => {
 	try {
-		if (!checkAuth(request)) {
+		const authenticated = await checkAuth(request)
+		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
 		if (!params.slug) {
@@ -34,7 +35,8 @@ export const GET: RequestHandler = async ({ request, params }) => {
 
 export const PATCH: RequestHandler = async ({ request, params }) => {
 	try {
-		if (!checkAuth(request)) {
+		const authenticated = await checkAuth(request)
+		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
 		if (!params.slug) {
@@ -62,7 +64,8 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 
 export const DELETE: RequestHandler = async ({ request, params }) => {
 	try {
-		if (!checkAuth(request)) {
+		const authenticated = await checkAuth(request)
+		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
 		if (!params.slug) {

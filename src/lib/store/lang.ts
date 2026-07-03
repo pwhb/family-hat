@@ -1,3 +1,4 @@
 import { writable } from 'svelte/store';
+import { createLocalStorageStore } from './store';
 
-export const langStore = writable<string>('en');
+export const langStore = createLocalStorageStore("lang", "en")

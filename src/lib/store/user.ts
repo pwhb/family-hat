@@ -1,3 +1,4 @@
-import { writable } from 'svelte/store';
 
-export const userIdStore = writable<string>('');
+import { createLocalStorageStore } from './store';
+
+export const userIdStore = createLocalStorageStore("userId", "")

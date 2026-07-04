@@ -70,7 +70,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		.aggregate([
 			{
 				$match: {
-					fromID: { $in: memberIDs }
+					sourceID: { $in: memberIDs }
 				}
 			},
 			{
@@ -92,14 +92,14 @@ export const load: PageServerLoad = async ({ params }) => {
 			{
 				$project: {
 					code: 1,
-					fromID: 1,
-					toID: 1,
-					fromGender: '$relationType.fromGender',
-					fromLabel: '$relationType.fromLabel',
-					fromEnd: '$relationType.fromEnd',
-					toGender: '$relationType.toGender',
-					toLabel: '$relationType.toLabel',
-					toEnd: '$relationType.toEnd'
+					sourceID: 1,
+					targetID: 1,
+					sourceGender: '$relationType.sourceGender',
+					sourceLabel: '$relationType.sourceLabel',
+					sourceEnd: '$relationType.sourceEnd',
+					targetGender: '$relationType.targetGender',
+					targetLabel: '$relationType.targetLabel',
+					targetEnd: '$relationType.targetEnd'
 				}
 			}
 		])

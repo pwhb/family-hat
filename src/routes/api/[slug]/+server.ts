@@ -15,7 +15,8 @@ export const GET: RequestHandler = async ({ params, request, url, cookies }) => 
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		const client = await clientPromise;
-		const col = client.db(DB_NAME).collection(params.slug);
+		const colName = params.slug.replaceAll('-', '_');
+		const col = client.db(DB_NAME).collection(colName);
 		const query: Filter<any> = { isActive: true };
 		url.searchParams.forEach((value, key) => {
 			if (key === 'q') {
@@ -65,21 +66,22 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 		}
 		const body = await request.json();
 		const client = await clientPromise;
-		const col = client.db(DB_NAME).collection(params.slug);
-		if (params.slug === 'members') {
+		const colName = params.slug.replaceAll('-', '_');
+		const col = client.db(DB_NAME).collection(colName);
+		if (colName === 'members') {
 			// members
 			body.code = body.name.en.replace(/\s/g, '_').toUpperCase();
-		} else if (params.slug === 'questions') {
+		} else if (colName === 'questions') {
 			// questions
 			if (body.options && body.options.length) {
 				for (const idx in body.options) {
 					body.options[idx].code = `${body.code}_${idx}`;
 				}
 			}
-		} else if (params.slug === 'relation_types') {
+		} else if (colName === 'relation_types') {
 			// relation types
-			body.code = `${body.fromLabel.en.replace(/\s/g, '_').toUpperCase()}_${body.toLabel.en.replace(/\s/g, '_').toUpperCase()}`;
-		} else if (params.slug === 'users') {
+			body.code = `${body.sourceLabel.en.replace(/\s/g, '_').toUpperCase()}_${body.targetLabel.en.replace(/\s/g, '_').toUpperCase()}`;
+		} else if (colName === 'users') {
 			body.hashedPassword = await hash(body.password, 10);
 			body.code = body.name.replace(/\s/g, '_').toUpperCase();
 			delete body.password;

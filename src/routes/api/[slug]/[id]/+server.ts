@@ -15,7 +15,8 @@ export const GET: RequestHandler = async ({ request, params, cookies }) => {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		const client = await clientPromise;
-		const col = client.db(DB_NAME).collection(params.slug);
+		const colName = params.slug.replaceAll('-', '_');
+		const col = client.db(DB_NAME).collection(colName);
 		const data = await col.findOne(
 			{ _id: new ObjectId(params.id), isActive: true },
 			{
@@ -45,7 +46,8 @@ export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 		}
 		const body = await request.json();
 		const client = await clientPromise;
-		const col = client.db(DB_NAME).collection(params.slug);
+		const colName = params.slug.replaceAll('-', '_');
+		const col = client.db(DB_NAME).collection(colName);
 		const data = await col.findOneAndUpdate(
 			{ _id: new ObjectId(params.id) },
 			{
@@ -73,7 +75,8 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		const client = await clientPromise;
-		const col = client.db(DB_NAME).collection(params.slug);
+		const colName = params.slug.replaceAll('-', '_');
+		const col = client.db(DB_NAME).collection(colName);
 		// const data = await col.deleteOne({ _id: new ObjectId(params.id) });
 		const data = await col.findOneAndUpdate(
 			{ _id: new ObjectId(params.id) },

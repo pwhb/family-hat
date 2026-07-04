@@ -35,13 +35,38 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 		}
 	];
 
-	if (params.slug === 'members') {
+	if (colName === 'members') {
 		const lookupSlice = createLookUpSlice({
 			from: 'families',
 			localField: 'familyID',
 			foreignField: '_id',
 			as: 'family'
 		});
+		const matchIndex = pipeline.findIndex((stage) => '$match' in stage);
+		if (matchIndex !== -1) {
+			pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
+		}
+	} else if (colName === "relationships") {
+		const lookupSlice = [
+			...createLookUpSlice({
+				from: 'members',
+				localField: 'sourceID',
+				foreignField: '_id',
+				as: 'sourceMember'
+			}),
+			...createLookUpSlice({
+				from: 'members',
+				localField: 'targetID',
+				foreignField: '_id',
+				as: 'targetMember'
+			}),
+			...createLookUpSlice({
+				from: 'relation_types',
+				localField: 'relationTypeID',
+				foreignField: '_id',
+				as: 'relationType'
+			}),
+		];
 		const matchIndex = pipeline.findIndex((stage) => '$match' in stage);
 		if (matchIndex !== -1) {
 			pipeline.splice(matchIndex + 1, 0, ...lookupSlice);

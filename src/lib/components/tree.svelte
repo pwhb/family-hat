@@ -47,8 +47,8 @@
 
 		svgPaths = relationships
 			.map((rel: any) => {
-				const fromEl = elRefs[rel.fromID];
-				const toEl = elRefs[rel.toID];
+				const fromEl = elRefs[rel.sourceID];
+				const toEl = elRefs[rel.targetID];
 
 				if (!fromEl || !toEl) return null;
 
@@ -60,16 +60,16 @@
 				const x2 = toRect.left + toRect.width / 2 - containerRect.left + scrollX;
 
 				const y1 =
-					(rel.fromEnd === 'top' ? fromRect.top : fromRect.bottom) - containerRect.top + scrollY;
-				const y2 = (rel.toEnd === 'top' ? toRect.top : toRect.bottom) - containerRect.top + scrollY;
+					(rel.sourceEnd === 'top' ? fromRect.top : fromRect.bottom) - containerRect.top + scrollY;
+				const y2 = (rel.targetEnd === 'top' ? toRect.top : toRect.bottom) - containerRect.top + scrollY;
 
 				const OVERLAP_OFFSET = 24;
 				let pathData = '';
 
-				if (rel.fromEnd === 'top' && rel.toEnd === 'top') {
+				if (rel.sourceEnd === 'top' && rel.targetEnd === 'top') {
 					const risePoint = Math.min(y1, y2) - OVERLAP_OFFSET;
 					pathData = `M ${x1} ${y1} V ${risePoint} H ${x2} V ${y2}`;
-				} else if (rel.fromEnd === 'bottom' && rel.toEnd === 'bottom') {
+				} else if (rel.sourceEnd === 'bottom' && rel.targetEnd === 'bottom') {
 					const dropPoint = Math.max(y1, y2) + OVERLAP_OFFSET;
 					pathData = `M ${x1} ${y1} V ${dropPoint} H ${x2} V ${y2}`;
 				} else {
@@ -79,7 +79,7 @@
 
 				return {
 					pathData,
-					label: rel.fromLabel[$langStore]
+					label: rel.sourceLabel[$langStore]
 				};
 			})
 			.filter(Boolean);

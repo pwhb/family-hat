@@ -31,7 +31,6 @@ export const POST: RequestHandler = async ({ request, params }) => {
         })
         return json({ token, expiresIn: authConf.jwtExpiresIn });
     } catch (error) {
-        console.log(error);
         return json({ message: 'Internal Server Error', log: error }, { status: 500 });
     }
 };

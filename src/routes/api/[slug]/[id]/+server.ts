@@ -4,9 +4,9 @@ import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
 
-export const GET: RequestHandler = async ({ request, params }) => {
+export const GET: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request)
+		const authenticated = await checkAuth(request, cookies)
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -33,9 +33,9 @@ export const GET: RequestHandler = async ({ request, params }) => {
 	}
 };
 
-export const PATCH: RequestHandler = async ({ request, params }) => {
+export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request)
+		const authenticated = await checkAuth(request, cookies)
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -62,9 +62,9 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 	}
 };
 
-export const DELETE: RequestHandler = async ({ request, params }) => {
+export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request)
+		const authenticated = await checkAuth(request, cookies)
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}

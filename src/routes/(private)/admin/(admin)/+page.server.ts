@@ -1,7 +1,7 @@
 import { DB_NAME, SECRET_KEY } from "$env/static/private";
 import clientPromise from "$lib/db";
 import { compare } from "bcrypt";
-import type { Actions } from "./$types";
+import type { Actions } from "../$types";
 import { getConfig } from "$lib/configs";
 import jwt from "jsonwebtoken"
 import { redirect } from "@sveltejs/kit";

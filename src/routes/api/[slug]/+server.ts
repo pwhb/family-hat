@@ -5,9 +5,9 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Filter } from 'mongodb';
 import { hash } from 'bcrypt';
 
-export const GET: RequestHandler = async ({ params, request, url }) => {
+export const GET: RequestHandler = async ({ params, request, url, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request)
+		const authenticated = await checkAuth(request, cookies)
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -51,9 +51,9 @@ export const GET: RequestHandler = async ({ params, request, url }) => {
 	}
 };
 
-export const POST: RequestHandler = async ({ request, params }) => {
+export const POST: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request)
+		const authenticated = await checkAuth(request, cookies)
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -95,7 +95,6 @@ export const POST: RequestHandler = async ({ request, params }) => {
 		});
 		return json({ data });
 	} catch (error) {
-		console.log(error);
 		if (error instanceof MongoServerError) {
 			if (error.code === 11000) {
 				return json({ message: 'Duplicate Key Error' }, { status: 409 });

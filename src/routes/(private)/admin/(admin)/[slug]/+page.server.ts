@@ -18,7 +18,8 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 		},
 		{
 			$project: {
-				appId: 0
+				appId: 0,
+				hashedPassword: 0
 			}
 		},
 		{
@@ -48,7 +49,7 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 	}
 	const data = await col.aggregate(pipeline).toArray();
 	const [_, admin, slug] = url.pathname.split('/');
-	const key = `${admin}_list_${slug}`.toUpperCase();
+	const key = `${admin}_list_${slug}`.replaceAll("-", "_").toUpperCase();
 	const pageConfig = await getConfig(key);
 	return {
 		key,

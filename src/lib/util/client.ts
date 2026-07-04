@@ -60,6 +60,7 @@ export function buildEditableObj(fields: any[], dataSource: any) {
 			obj[field.key] = rawValue !== undefined ? rawValue : '';
 		}
 	}
-
 	return obj;
 }
+
+

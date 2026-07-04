@@ -61,7 +61,7 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		if (params.slug === 'users' && MODE !== 'dev') {
-			return json({ message: 'Forbidden' }, { status: 403 });
+			return json({ message: 'Creating a new user is only allowed in dev mode.' }, { status: 403 });
 		}
 		const body = await request.json();
 		const client = await clientPromise;

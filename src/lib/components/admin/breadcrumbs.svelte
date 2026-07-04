@@ -25,12 +25,27 @@
 		}
 		return list;
 	};
+
+	const isListPage = (pathname: string) => {
+		const split = pathname.split('/');
+		if (split.length === 3 && split[2] !== "me") {
+			return true
+		}
+		return false;
+	};
 </script>
 
-<div class="m-4 breadcrumbs text-sm">
-	<ul>
-		{#each createBreadcrumbs(page.url.pathname) as item}
-			<li class=" capitalize"><a href={item.url}>{item.label}</a></li>
-		{/each}
-	</ul>
+<div class="mx-10 flex items-center justify-between">
+	<div class="m-4 breadcrumbs text-sm">
+		<ul>
+			{#each createBreadcrumbs(page.url.pathname) as item}
+				<li class=" capitalize"><a href={item.url}>{item.label}</a></li>
+			{/each}
+		</ul>
+	</div>
+	<div>
+		{#if isListPage(page.url.pathname)}
+			<a class="btn btn-sm btn-primary" href={`${page.url.pathname}/create`}>Create</a>
+		{/if}
+	</div>
 </div>

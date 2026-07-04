@@ -3,8 +3,8 @@
 	import { langStore } from '$lib/store/lang';
 	import { onMount } from 'svelte';
 
-	const getLevels = (list: any[]) =>
-		Object.entries(
+	const getLevels = (list: any[]) => {
+		return Object.entries(
 			list.reduce((acc: any, person: any) => {
 				acc[person.level] = acc[person.level] || [];
 				acc[person.level].push(person);
@@ -16,6 +16,7 @@
 				level,
 				members.sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
 			]);
+	};
 
 	const { families, relationships } = page.data;
 
@@ -61,7 +62,8 @@
 
 				const y1 =
 					(rel.sourceEnd === 'top' ? fromRect.top : fromRect.bottom) - containerRect.top + scrollY;
-				const y2 = (rel.targetEnd === 'top' ? toRect.top : toRect.bottom) - containerRect.top + scrollY;
+				const y2 =
+					(rel.targetEnd === 'top' ? toRect.top : toRect.bottom) - containerRect.top + scrollY;
 
 				const OVERLAP_OFFSET = 24;
 				let pathData = '';

@@ -45,7 +45,7 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 
 	const data = await col.aggregate(pipeline).toArray();
 	const [_, admin, slug, action] = url.pathname.split('/');
-	const key = `${admin}_${action}_${slug}`.replaceAll("-", "_").toUpperCase();
+	const key = `${admin}_${action}_${slug}`.replaceAll('-', '_').toUpperCase();
 	const pageConfig = await getConfig(key);
 	return {
 		key,

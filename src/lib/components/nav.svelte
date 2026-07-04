@@ -20,7 +20,7 @@
 			{#if browser}
 				<button
 					onclick={() => langStore.set(getNextLanguage($langStore))}
-					class="btn avatar btn-circle btn-neutral"
+					class="btn avatar btn-circle"
 				>
 					<div class="w-10 rounded-full">
 						<img

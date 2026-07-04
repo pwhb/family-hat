@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 		if (matchIndex !== -1) {
 			pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
 		}
-	} else if (colName === "relationships") {
+	} else if (colName === 'relationships') {
 		const lookupSlice = [
 			...createLookUpSlice({
 				from: 'members',
@@ -65,7 +65,7 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 				localField: 'relationTypeID',
 				foreignField: '_id',
 				as: 'relationType'
-			}),
+			})
 		];
 		const matchIndex = pipeline.findIndex((stage) => '$match' in stage);
 		if (matchIndex !== -1) {
@@ -74,7 +74,7 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 	}
 	const data = await col.aggregate(pipeline).toArray();
 	const [_, admin, slug] = url.pathname.split('/');
-	const key = `${admin}_list_${slug}`.replaceAll("-", "_").toUpperCase();
+	const key = `${admin}_list_${slug}`.replaceAll('-', '_').toUpperCase();
 	const pageConfig = await getConfig(key);
 	return {
 		key,

@@ -28,8 +28,8 @@
 
 	const isListPage = (pathname: string) => {
 		const split = pathname.split('/');
-		if (split.length === 3 && split[2] !== "me") {
-			return true
+		if (split.length === 3 && split[2] !== 'me') {
+			return true;
 		}
 		return false;
 	};

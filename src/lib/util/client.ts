@@ -62,5 +62,3 @@ export function buildEditableObj(fields: any[], dataSource: any) {
 	}
 	return obj;
 }
-
-

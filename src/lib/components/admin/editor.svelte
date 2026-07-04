@@ -85,6 +85,16 @@
 							placeholder={field.placeholder || `${field.name}`}
 						/>
 					</fieldset>
+				{:else if field.inputtype === 'number'}
+					<fieldset class="fieldset p-4">
+						<legend class="fieldset-legend">{field.name}</legend>
+						<input
+							bind:value={obj[field.key]}
+							type="number"
+							class="input"
+							placeholder={field.placeholder || `${field.name}`}
+						/>
+					</fieldset>
 				{:else if field.inputtype === 'textarea'}
 					<fieldset class="fieldset p-4">
 						<legend class="fieldset-legend">{field.name}</legend>
@@ -100,7 +110,6 @@
 					<fieldset class="fieldset p-4">
 						<legend class="fieldset-legend">{field.name}</legend>
 						{#await getOptions(field.options) then options}
-						<p>{JSON.stringify(options)}</p>
 							<select class="select" bind:value={obj[field.key]}>
 								{#each options as option}
 									<option value={option.value}>{option.label}</option>

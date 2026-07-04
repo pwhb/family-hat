@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { langStore } from '$lib/store/lang';
 	import { onMount } from 'svelte';
 
@@ -17,9 +16,14 @@
 				members.sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
 			]);
 	};
+	interface TreeProps {
+		families: any[];
+		relationships: any[];
+		focus?: string;
+		showTitle?: boolean;
+	}
 
-	const { families, relationships } = page.data;
-
+	let { families, relationships, focus, showTitle }: TreeProps = $props();
 	// --- DOM Elements & Path States ---
 	let scrollContainerRef: HTMLElement | null = $state(null);
 	let elRefs: Record<string, HTMLElement> = $state({});
@@ -98,6 +102,8 @@
 
 	$effect(() => {
 		const _lang = $langStore;
+		const _families = families;
+		const _relationships = relationships;
 		requestPathUpdate();
 	});
 
@@ -111,11 +117,7 @@
 	});
 </script>
 
-<div
-	bind:this={scrollContainerRef}
-	class="relative h-screen w-screen overflow-auto bg-gray-50 p-8"
-	onscroll={requestPathUpdate}
->
+<div bind:this={scrollContainerRef} class="relative overflow-auto p-8" onscroll={requestPathUpdate}>
 	<svg
 		class="pointer-events-none absolute top-0 left-0 z-0"
 		width={svgDimensions.width}
@@ -135,19 +137,26 @@
 	<div class="relative z-10 mx-auto flex min-h-full w-max flex-row items-center gap-12">
 		{#each families as item, idx}
 			<div class="flex flex-col items-center justify-center px-4">
-				<h1 class="mb-12 text-2xl font-bold text-gray-800">
-					{item.family.fullName[$langStore]}
-				</h1>
+				{#if showTitle}
+					<h1 class="mb-12 text-2xl font-bold text-gray-800">
+						{item.family.fullName[$langStore]}
+					</h1>
+				{/if}
 				<div class="flex w-full max-w-4xl flex-col items-center gap-24">
 					{#each getLevels(item.members) as [level, members]}
 						<div class="flex w-full flex-col items-center">
 							<div class="flex w-full items-start justify-center gap-8">
 								{#each members as person}
-									<div
+									<a
 										bind:this={elRefs[person._id]}
-										class={`group relative min-h-24 w-48 min-w-37.5 rounded-xl border border-gray-200 p-4 text-center shadow-md ${item.family.bgColor}`}
+										class={`group relative min-h-24 w-16 min-w-37.5 rounded-xl border border-gray-200 p-4 text-center text-xs shadow-md md:w-24 md:text-sm ${item.family.bgColor}`}
+										href={`/tree/members/${person._id}`}
 									>
-										<p class="font-bold text-gray-800">
+										<p
+											class={focus && focus === person._id
+												? 'font-semibold text-gray-800 underline'
+												: 'font-semibold text-gray-800'}
+										>
 											{person.name[$langStore]}
 										</p>
 										{#if person.title[$langStore]}
@@ -157,7 +166,7 @@
 										{#if person._id === item.family.center}
 											<span class="absolute -top-4 right-0 text-2xl">👑</span>
 										{/if}
-									</div>
+									</a>
 								{/each}
 							</div>
 						</div>

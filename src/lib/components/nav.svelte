@@ -11,7 +11,7 @@
 	}
 </script>
 
-{#if pageConf.showNav}
+{#if pageConf && pageConf.showNav}
 	<div class="navbar bg-base-200 px-4 shadow-sm">
 		<div class="flex-1">
 			<a class="btn text-xl btn-ghost" href="/">{config.appName[$langStore]}</a>

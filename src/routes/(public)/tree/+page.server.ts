@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
+import { createLookUpSlice } from '$lib/util/server';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const client = await clientPromise;
@@ -27,24 +28,13 @@ export const load: PageServerLoad = async ({ params }) => {
 					}
 				}
 			},
-			{
-				$addFields: {
-					familyID: {
-						$toObjectId: '$_id'
-					}
-				}
-			},
-			{
-				$lookup: {
-					from: 'families',
-					localField: 'familyID',
-					foreignField: '_id',
-					as: 'family'
-				}
-			},
-			{
-				$unwind: '$family'
-			},
+
+			...createLookUpSlice({
+				from: 'families',
+				localField: '_id',
+				foreignField: '_id',
+				as: 'family'
+			}),
 			{
 				$project: {
 					members: 1,
@@ -73,22 +63,12 @@ export const load: PageServerLoad = async ({ params }) => {
 					sourceID: { $in: memberIDs }
 				}
 			},
-			{
-				$addFields: {
-					relationTypeID: { $toObjectId: '$relationTypeID' }
-				}
-			},
-			{
-				$lookup: {
-					from: 'relation_types',
-					localField: 'relationTypeID',
-					foreignField: '_id',
-					as: 'relationType'
-				}
-			},
-			{
-				$unwind: '$relationType'
-			},
+			...createLookUpSlice({
+				from: 'relation_types',
+				localField: 'relationTypeID',
+				foreignField: '_id',
+				as: 'relationType'
+			}),
 			{
 				$project: {
 					code: 1,

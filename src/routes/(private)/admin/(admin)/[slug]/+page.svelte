@@ -25,12 +25,13 @@
 									<td>{formatDateTime(getDeepValue(row, rowConf.key))}</td>
 								{:else if rowConf.datatype === 'boolean'}
 									<td>
-									<span class={getDeepValue(row, rowConf.key)
-											? 'text-white uppercase badge badge-success'
-											: 'text-white uppercase badge badge-error'}>
-
-										{getDeepValue(row, rowConf.key)}
-									</span>
+										<span
+											class={getDeepValue(row, rowConf.key)
+												? 'badge text-white uppercase badge-success'
+												: 'badge text-white uppercase badge-error'}
+										>
+											{getDeepValue(row, rowConf.key)}
+										</span>
 									</td>
 								{:else}
 									<td>{getDeepValue(row, rowConf.key)}</td>

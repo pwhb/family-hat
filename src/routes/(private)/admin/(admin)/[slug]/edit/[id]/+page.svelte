@@ -56,7 +56,8 @@
 				{:else if field.inputtype === 'textarea'}
 					<fieldset class="fieldset p-4">
 						<legend class="fieldset-legend">{field.name}</legend>
-						<textarea class="textarea w-full" placeholder={field.name} bind:value={obj[field.key]}></textarea>
+						<textarea class="textarea w-full" placeholder={field.name} bind:value={obj[field.key]}
+						></textarea>
 						<!-- <input type="checkbox" bind:checked={obj[field.key]} class="toggle" /> -->
 					</fieldset>
 				{:else if field.inputtype === 'checkbox'}

@@ -2,25 +2,28 @@ import { DB_NAME, MODE, ROOT_TOKEN, SECRET_KEY } from '$env/static/private';
 import clientPromise from '$lib/db';
 import { getToken } from '$lib/util/client';
 import type { Cookies } from '@sveltejs/kit';
-import jwt from "jsonwebtoken"
+import jwt from 'jsonwebtoken';
 import type { Document } from 'mongodb';
 export const checkAuth = async (request: Request, cookies: Cookies) => {
-	let token = cookies.get("admin_token")
-	if (!token && MODE === "dev") {
+	let token = cookies.get('admin_token');
+	if (!token && MODE === 'dev') {
 		token = getToken(request) as string;
 	}
-	if (!token) return
-	return await getUserFromToken(token)
+	if (!token) return;
+	return await getUserFromToken(token);
 };
 
 export const getUserFromToken = async (token: string) => {
-	const payload: any = jwt.verify(token, SECRET_KEY)
-	const client = await clientPromise
-	const user = await client.db(DB_NAME).collection("users").findOne({ username: payload.username, isActive: true })
-	if (!user) return
-	delete user.hashedPassword
-	return user
-}
+	const payload: any = jwt.verify(token, SECRET_KEY);
+	const client = await clientPromise;
+	const user = await client
+		.db(DB_NAME)
+		.collection('users')
+		.findOne({ username: payload.username, isActive: true });
+	if (!user) return;
+	delete user.hashedPassword;
+	return user;
+};
 
 export const checkBasicAuth = (request: Request) => {
 	const token = getToken(request, 'x-api-token');
@@ -54,11 +57,11 @@ export const createLookUpSlice = ({
 		{
 			$lookup: {
 				from,
-				let: { searchId: opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` } },
-				pipeline: [
-					{ $match: { $expr: { $eq: [`$${foreignField}`, "$$searchId"] } } },
-				],
-				as,
+				let: {
+					searchId: opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` }
+				},
+				pipeline: [{ $match: { $expr: { $eq: [`$${foreignField}`, '$$searchId'] } } }],
+				as
 			}
 		},
 		{
@@ -66,10 +69,10 @@ export const createLookUpSlice = ({
 				path: `$${as}`,
 				preserveNullAndEmptyArrays: true
 			}
-		},
-	]
+		}
+	];
 	if (opts && opts.project) {
-		slice[0].$lookup.pipeline = [...slice[0].$lookup.pipeline, { $project: opts.project }]
+		slice[0].$lookup.pipeline = [...slice[0].$lookup.pipeline, { $project: opts.project }];
 	}
-	return slice
-}
+	return slice;
+};

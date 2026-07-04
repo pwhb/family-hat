@@ -7,7 +7,7 @@ import { hash } from 'bcrypt';
 
 export const GET: RequestHandler = async ({ params, request, url, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies)
+		const authenticated = await checkAuth(request, cookies);
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -53,7 +53,7 @@ export const GET: RequestHandler = async ({ params, request, url, cookies }) => 
 
 export const POST: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies)
+		const authenticated = await checkAuth(request, cookies);
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -80,9 +80,9 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 			// relation types
 			body.code = `${body.fromLabel.en.replace(/\s/g, '_').toUpperCase()}_${body.toLabel.en.replace(/\s/g, '_').toUpperCase()}`;
 		} else if (params.slug === 'users') {
-			body.hashedPassword = await hash(body.password, 10)
+			body.hashedPassword = await hash(body.password, 10);
 			body.code = body.name.replace(/\s/g, '_').toUpperCase();
-			delete body.password
+			delete body.password;
 		}
 
 		const data = await col.insertOne({

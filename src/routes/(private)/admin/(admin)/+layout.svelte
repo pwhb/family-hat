@@ -12,13 +12,13 @@
 		<nav class="navbar w-full bg-base-300">
 			<label for="my-drawer-4" aria-label="open sidebar" class="btn btn-square btn-ghost">
 				<!-- Sidebar toggle icon -->
-				<img src="/menu-alt-2-svgrepo-com.svg" alt="menus"/>
+				<img src="/menu-alt-2-svgrepo-com.svg" alt="menus" />
 			</label>
 			<div class="px-4">Family Admin</div>
 		</nav>
 		<!-- Page content here -->
-		<Breadcrumbs/>
-		<Toast/>
+		<Breadcrumbs />
+		<Toast />
 		{@render children()}
 	</div>
 

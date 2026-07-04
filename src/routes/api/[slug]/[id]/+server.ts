@@ -7,7 +7,7 @@ import { updated } from '$app/state';
 
 export const GET: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies)
+		const authenticated = await checkAuth(request, cookies);
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ request, params, cookies }) => {
 
 export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies)
+		const authenticated = await checkAuth(request, cookies);
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}
@@ -65,7 +65,7 @@ export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 
 export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies)
+		const authenticated = await checkAuth(request, cookies);
 		if (!authenticated) {
 			return json({ message: 'Unauthorized' }, { status: 401 });
 		}

@@ -9,12 +9,12 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 		redirect(302, '/admin/login');
 	}
 	if (token && url.pathname === '/admin/login') {
-		redirect(302, "/admin")
+		redirect(302, '/admin');
 	}
 	if (token) {
-		const user = await getUserFromToken(token)
-		const adminConf = await getConfig("ADMIN_CONFIG")
-		return { user, adminConf }
+		const user = await getUserFromToken(token);
+		const adminConf = await getConfig('ADMIN_CONFIG');
+		return { user, adminConf };
 	}
 	return {};
 };

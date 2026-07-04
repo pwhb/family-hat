@@ -1,3 +1,5 @@
+import { format, compareAsc } from "date-fns";
+
 export const getToken = (request: Request, header = 'authorization') => {
     const auth = request.headers.get(header);
     if (!auth) {
@@ -7,17 +9,8 @@ export const getToken = (request: Request, header = 'authorization') => {
 };
 
 
-// export function getValue(obj: Record<string, any>, path: string, fallback: any = undefined): any {
-//     if (!obj || typeof path !== 'string') return fallback;
+export const formatDateTime = (str:string) => format(str, 'MMM d, yyyy HH:mm')
 
-//     const value = path.split('.').reduce((current, key) => {
-//         return current && typeof current === 'object' && key in current 
-//             ? current[key] 
-//             : undefined;
-//     }, obj);
-
-//     return value !== undefined ? value : fallback;
-// }
 export function fillTemplate(template: string, source: Record<string, any>): string {
     if (!template || !source) return template;
     return template.replace(/\{\{(.*?)\}\}/g, (match, path) => {
@@ -57,7 +50,7 @@ export function getDeepValue(source: any, path: string) {
 
 export function buildEditableObj(fields: any[], dataSource: any) {
     const obj: Record<string, any> = {};
-
+    if (!fields || !fields.length) return {}
     for (const field of fields) {
         const rawValue = getDeepValue(dataSource, field.key);
 

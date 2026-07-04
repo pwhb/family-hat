@@ -15,6 +15,24 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
                 _id: new ObjectId(params.id)
             }
         },
+        ...createLookUpSlice({
+            from: "users",
+            localField: "createdBy",
+            foreignField: "_id",
+            as: "createdByUser",
+            opts: {
+                project: { name: 1, username: 1 }
+            }
+        }),
+        ...createLookUpSlice({
+            from: "users",
+            localField: "updatedBy",
+            foreignField: "_id",
+            as: "updatedByUser",
+            opts: {
+                project: { name: 1, username: 1 }
+            }
+        }),
         {
             $project: {
                 appId: 0,
@@ -25,24 +43,10 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
         }
     ]
 
-    if (params.slug === "members") {
-        const lookupSlice = createLookUpSlice({
-            from: "families",
-            localField: "familyID",
-            foreignField: "_id",
-            as: "family"
-        })
-        const matchIndex = pipeline.findIndex(stage => '$match' in stage);
-
-        if (matchIndex !== -1) {
-            pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
-        }
-    }
-
     const data = await col
         .aggregate(pipeline)
         .toArray()
-     const [_, admin, slug, action] = url.pathname.split("/")
+    const [_, admin, slug, action] = url.pathname.split("/")
     const key = `${admin}_${action}_${slug}`.toUpperCase();
     const pageConfig = await getConfig(key)
     return {

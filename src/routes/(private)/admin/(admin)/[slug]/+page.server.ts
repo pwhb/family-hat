@@ -22,6 +22,11 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
             },
         },
         {
+            $sort: {
+                _id: -1
+            }
+        },
+        {
             $skip: (page - 1) * size,
         },
         {

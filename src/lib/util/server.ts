@@ -3,6 +3,7 @@ import clientPromise from '$lib/db';
 import { getToken } from '$lib/util/client';
 import type { Cookies } from '@sveltejs/kit';
 import jwt from "jsonwebtoken"
+import type { Document } from 'mongodb';
 export const checkAuth = async (request: Request, cookies: Cookies) => {
 	let token = cookies.get("admin_token")
 	if (!token && MODE === "dev") {
@@ -40,24 +41,24 @@ export const createLookUpSlice = ({
 	from,
 	localField,
 	foreignField,
-	as
+	as,
+	opts
 }: {
 	from: string;
 	localField: string;
 	foreignField: string;
 	as: string;
-}) => [
-		{
-			$addFields: {
-				[localField]: { $toObjectId: `$${localField}` }
-			}
-		},
+	opts?: any;
+}) => {
+	const slice: Document[] = [
 		{
 			$lookup: {
 				from,
-				localField,
-				foreignField,
-				as
+				let: { searchId: opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` } },
+				pipeline: [
+					{ $match: { $expr: { $eq: [`$${foreignField}`, "$$searchId"] } } },
+				],
+				as,
 			}
 		},
 		{
@@ -67,3 +68,8 @@ export const createLookUpSlice = ({
 			}
 		},
 	]
+	if (opts && opts.project) {
+		slice[0].$lookup.pipeline = [...slice[0].$lookup.pipeline, { $project: opts.project }]
+	}
+	return slice
+}

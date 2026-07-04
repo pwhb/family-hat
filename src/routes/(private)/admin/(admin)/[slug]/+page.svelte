@@ -1,9 +1,8 @@
 <script>
 	import { page } from '$app/state';
-	import { getDeepValue } from '$lib/util/client';
+	import { formatDateTime, getDeepValue } from '$lib/util/client';
 </script>
 
-<!-- <p>{JSON.stringify(page.data.pageData.data[0])}</p> -->
 {#if page.data.pageConfig}
 	<div class="overflow-x-auto">
 		<table class="table">
@@ -22,10 +21,24 @@
 						<th>{(page.data.pageData.page - 1) * page.data.pageData.size + idx + 1}</th>
 						{#each page.data.pageConfig.row as rowConf}
 							{#if rowConf.type === 'display'}
-								<td>{getDeepValue(row, rowConf.key)}</td>
+								{#if rowConf.datatype === 'datetime'}
+									<td>{formatDateTime(getDeepValue(row, rowConf.key))}</td>
+								{:else if rowConf.datatype === 'boolean'}
+									<td>
+									<span class={getDeepValue(row, rowConf.key)
+											? 'text-white uppercase badge badge-success'
+											: 'text-white uppercase badge badge-error'}>
+
+										{getDeepValue(row, rowConf.key)}
+									</span>
+									</td>
+								{:else}
+									<td>{getDeepValue(row, rowConf.key)}</td>
+								{/if}
 							{:else if rowConf.type === 'actions'}
 								<td>
-									<a href={`${page.url.pathname}/edit/${row._id}`} class="btn btn-secondary">Edit</a>
+									<a href={`${page.url.pathname}/edit/${row._id}`} class="btn btn-secondary">Edit</a
+									>
 								</td>
 							{/if}
 						{/each}

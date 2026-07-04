@@ -24,6 +24,7 @@
 		"@types/node": "^22",
 		"bcrypt": "^6.0.0",
 		"daisyui": "^5.5.20",
+		"date-fns": "^4.4.0",
 		"eslint": "^10.4.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.17.0",

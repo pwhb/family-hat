@@ -1,7 +1,7 @@
 <script>
-	import { page } from '$app/state';
 	import Breadcrumbs from '$lib/components/admin/breadcrumbs.svelte';
 	import Sidebar from '$lib/components/admin/sidebar.svelte';
+	import Toast from '$lib/components/toast.svelte';
 	let { children } = $props();
 </script>
 
@@ -12,23 +12,13 @@
 		<nav class="navbar w-full bg-base-300">
 			<label for="my-drawer-4" aria-label="open sidebar" class="btn btn-square btn-ghost">
 				<!-- Sidebar toggle icon -->
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 24 24"
-					stroke-linejoin="round"
-					stroke-linecap="round"
-					stroke-width="2"
-					fill="none"
-					stroke="currentColor"
-					class="my-1.5 inline-block size-4"
-					><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"
-					></path><path d="M9 4v16"></path><path d="M14 10l2 2l-2 2"></path></svg
-				>
+				<img src="/menu-alt-2-svgrepo-com.svg" alt="menus"/>
 			</label>
 			<div class="px-4">Family Admin</div>
 		</nav>
 		<!-- Page content here -->
 		<Breadcrumbs/>
+		<Toast/>
 		{@render children()}
 	</div>
 

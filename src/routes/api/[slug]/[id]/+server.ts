@@ -3,6 +3,7 @@ import { checkAuth } from '$lib/util/server';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
+import { updated } from '$app/state';
 
 export const GET: RequestHandler = async ({ request, params, cookies }) => {
 	try {
@@ -50,8 +51,8 @@ export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 			{
 				$set: {
 					...body,
-					appId: APP_ID,
-					updatedAt: new Date()
+					updatedAt: new Date(),
+					updatedBy: authenticated._id
 				}
 			},
 			{ returnDocument: 'after' }
@@ -79,7 +80,8 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
 			{
 				$set: {
 					isActive: false,
-					updatedAt: new Date()
+					updatedAt: new Date(),
+					updatedBy: authenticated._id
 				}
 			},
 			{ returnDocument: 'after' }

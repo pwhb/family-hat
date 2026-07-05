@@ -65,17 +65,17 @@
 				const x2 = toRect.left + toRect.width / 2 - containerRect.left + scrollX;
 
 				const y1 =
-					(rel.sourceEnd === 'top' ? fromRect.top : fromRect.bottom) - containerRect.top + scrollY;
+					(rel.sourceEnd === 'TOP' ? fromRect.top : fromRect.bottom) - containerRect.top + scrollY;
 				const y2 =
-					(rel.targetEnd === 'top' ? toRect.top : toRect.bottom) - containerRect.top + scrollY;
+					(rel.targetEnd === 'TOP' ? toRect.top : toRect.bottom) - containerRect.top + scrollY;
 
 				const OVERLAP_OFFSET = 24;
 				let pathData = '';
 
-				if (rel.sourceEnd === 'top' && rel.targetEnd === 'top') {
+				if (rel.sourceEnd === 'TOP' && rel.targetEnd === 'TOP') {
 					const risePoint = Math.min(y1, y2) - OVERLAP_OFFSET;
 					pathData = `M ${x1} ${y1} V ${risePoint} H ${x2} V ${y2}`;
-				} else if (rel.sourceEnd === 'bottom' && rel.targetEnd === 'bottom') {
+				} else if (rel.sourceEnd === 'BOTTOM' && rel.targetEnd === 'BOTTOM') {
 					const dropPoint = Math.max(y1, y2) + OVERLAP_OFFSET;
 					pathData = `M ${x1} ${y1} V ${dropPoint} H ${x2} V ${y2}`;
 				} else {
@@ -164,7 +164,7 @@
 											<p class="text-gray-800">({person.title[$langStore]})</p>
 										{/if}
 										{#if person._id === item.family.center}
-											<span class="absolute -top-4 right-0 text-2xl">👑</span>
+											<span class="absolute -top-6 right-0 text-2xl">👑</span>
 										{/if}
 									</a>
 								{/each}

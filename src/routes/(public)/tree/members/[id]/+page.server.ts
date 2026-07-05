@@ -70,7 +70,8 @@ export const load: PageServerLoad = async ({ params }) => {
 							level: '$level',
 							order: '$order',
 							related: '$related',
-							avatarUrl: '$avatarUrl'
+							avatarUrl: '$avatarUrl',
+							gender: '$gender'
 						}
 					}
 				}

@@ -23,7 +23,9 @@ export const load: PageServerLoad = async ({ params }) => {
 							archetype: '$archetype',
 							level: '$level',
 							order: '$order',
-							related: '$related'
+							related: '$related',
+							avatarUrl: '$avatarUrl',
+							gender: '$gender'
 						}
 					}
 				}

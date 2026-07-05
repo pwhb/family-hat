@@ -1,4 +1,4 @@
-import { getConfig } from '$lib/configs';
+import { getConfig } from '$lib/util/configs';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ url, params }) => {

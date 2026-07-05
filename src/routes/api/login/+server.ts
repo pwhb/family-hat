@@ -1,5 +1,5 @@
 import { DB_NAME, MODE, SECRET_KEY } from '$env/static/private';
-import { getConfig } from '$lib/configs';
+import { getConfig } from '$lib/util/configs';
 import clientPromise from '$lib/db';
 import { checkBasicAuth } from '$lib/util/server';
 import { json, type RequestHandler } from '@sveltejs/kit';

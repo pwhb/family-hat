@@ -4,6 +4,7 @@ import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ObjectId } from 'mongodb';
 import { updated } from '$app/state';
+import { delCache } from '$lib/util/redis';
 
 export const GET: RequestHandler = async ({ request, params, cookies }) => {
 	try {
@@ -59,6 +60,9 @@ export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 			},
 			{ returnDocument: 'after' }
 		);
+		if (colName === 'configs' && data) {
+			await delCache(data.key);
+		}
 		return json({ data });
 	} catch (error) {
 		return json({ message: 'Internal Server Error', log: error }, { status: 500 });

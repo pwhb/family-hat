@@ -1,7 +1,8 @@
 import { DB_NAME } from '$env/static/private';
-import clientPromise from './db';
+import clientPromise from '../db';
+import { getCache, setCache } from './redis';
 
-export const getConfig = async (key: string) => {
+const getConfigFromDB = async (key: string) => {
 	const client = await clientPromise;
 	const col = client.db(DB_NAME).collection('configs');
 	const data = await col.findOne({ key });
@@ -18,4 +19,12 @@ export const getConfig = async (key: string) => {
 		}
 	}
 	return data?.value;
+};
+
+export const getConfig = async (key: string) => {
+	const cached = await getCache(key);
+	if (cached) return JSON.parse(cached);
+	const confFromDB = await getConfigFromDB(key);
+	await setCache(key, JSON.stringify(confFromDB));
+	return confFromDB;
 };

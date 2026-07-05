@@ -1,4 +1,4 @@
-import { getConfig } from '$lib/configs';
+import { getConfig } from '$lib/util/configs';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from '../$types';
 import { checkAuth, getUserFromToken } from '$lib/util/server';

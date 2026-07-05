@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { getConfig } from '$lib/configs';
+import { getConfig } from '$lib/util/configs';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const [_, admin, slug, action] = url.pathname.split('/');

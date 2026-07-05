@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ params }) => {
 					'family.code': 1,
 					'family.fullName': 1,
 					'family.center': 1,
-					'family.bgColor': 1
+					'family.customCss': 1
 				}
 			}
 		])

@@ -10,7 +10,7 @@
 
 <div class="my-10 flex items-center justify-center">
 	<Hover3d>
-		<IdCard {member} {family} />
+		<IdCard {member} {family} type="full" />
 	</Hover3d>
 </div>
 

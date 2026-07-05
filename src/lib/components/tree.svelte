@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { langStore } from '$lib/store/lang';
 	import { onMount } from 'svelte';
+	import Hover3d from './hover3d.svelte';
+	import IdCard from './id_card.svelte';
 
 	const getLevels = (list: any[]) => {
 		return Object.entries(
@@ -134,9 +136,9 @@
 		{/each}
 	</svg>
 
-	<div class="relative z-10 mx-auto flex min-h-full w-max flex-row items-center gap-12">
+	<div class="relative z-10 mx-auto flex min-h-full w-max flex-row items-center gap-4">
 		{#each families as item, idx}
-			<div class="flex flex-col items-center justify-center px-4">
+			<div class="flex flex-col items-center justify-center px-10">
 				{#if showTitle}
 					<h1 class="mb-12 text-2xl font-bold text-gray-800">
 						{item.family.fullName[$langStore]}
@@ -146,10 +148,15 @@
 					{#each getLevels(item.members) as [level, members]}
 						<div class="flex w-full flex-col items-center">
 							<div class="flex w-full items-start justify-center gap-8">
-								{#each members as person}
-									<a
+								{#each members as member}
+									<a bind:this={elRefs[member._id]} href={`/tree/members/${member._id}`}>
+										<Hover3d>
+											<IdCard {member} family={item.family} {focus} />
+										</Hover3d>
+									</a>
+									<!-- <a
 										bind:this={elRefs[person._id]}
-										class={`group relative min-h-24 w-16 min-w-37.5 rounded-xl border border-gray-200 p-4 text-center text-xs shadow-md md:w-24 md:text-sm ${item.family.bgColor}`}
+										class={`group relative min-h-24 w-16 min-w-37.5 rounded-xl border border-gray-200 p-4 text-center text-xs shadow-md md:w-24 md:text-sm ${item.family.customCss}`}
 										href={`/tree/members/${person._id}`}
 									>
 										<p
@@ -166,7 +173,7 @@
 										{#if person._id === item.family.center}
 											<span class="absolute -top-6 right-0 text-2xl">👑</span>
 										{/if}
-									</a>
+									</a> -->
 								{/each}
 							</div>
 						</div>

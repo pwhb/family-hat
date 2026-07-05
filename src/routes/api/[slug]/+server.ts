@@ -4,6 +4,7 @@ import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Filter } from 'mongodb';
 import { hash } from 'bcrypt';
+import { encrypt } from '$lib/util/crypto';
 
 export const GET: RequestHandler = async ({ params, request, url, cookies }) => {
 	try {
@@ -85,6 +86,8 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 			body.hashedPassword = await hash(body.password, 10);
 			body.code = body.name.replace(/\s/g, '_').toUpperCase();
 			delete body.password;
+		} else if (colName === 'configs' && body.type && body.type === 'secured') {
+			body.value = await encrypt(body.value);
 		}
 
 		const data = await col.insertOne({

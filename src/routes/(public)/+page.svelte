@@ -17,7 +17,7 @@
 			</div>
 			<div class="flex justify-center gap-5">
 				{#each pageConf.buttons as btn}
-					<a href={btn.link} class={`btn pt-2 text-white ${btn.class}`}>{btn.label[$langStore]}</a>
+					<a href={btn.link} class={`btn text-white ${btn.class}`}>{btn.label[$langStore]}</a>
 				{/each}
 			</div>
 		</div>

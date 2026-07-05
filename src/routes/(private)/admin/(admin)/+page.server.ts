@@ -5,6 +5,30 @@ import type { Actions } from '../$types';
 import { getConfig } from '$lib/util/configs';
 import jwt from 'jsonwebtoken';
 import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({}) => {
+	const client = await clientPromise;
+	const key = 'ADMIN_DASHBOARD';
+	const pageConfig = await getConfig(key);
+	const colList = ['members', 'families', 'relation_types', 'relationships'];
+	const pageData: any = {};
+	const promises = colList.map(async (colName) => {
+		const collection = client.db(DB_NAME).collection(colName);
+		const [total, count] = await Promise.all([
+			collection.countDocuments(),
+			collection.countDocuments({ isActive: true })
+		]);
+		pageData[colName] = { total, count };
+	});
+	await Promise.all(promises);
+
+	return {
+		key,
+		pageData,
+		pageConfig
+	};
+};
 
 export const actions: Actions = {
 	login: async ({ request, cookies }) => {

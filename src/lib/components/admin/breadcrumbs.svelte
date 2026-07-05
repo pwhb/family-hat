@@ -12,9 +12,7 @@
 			list.push({
 				label: split[2],
 				url:
-					split[2] === 'me'
-						? `/${split[1]}/${split[2]}`
-						: `/${split[1]}/${split[2]}${page.url.search || '?page=1&size=10'}`
+					split[2] === 'me' ? `/${split[1]}/${split[2]}` : `/${split[1]}/${split[2]}?page=1&size=10`
 			});
 		}
 		if (split[3] && split[4]) {

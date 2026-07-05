@@ -4,6 +4,7 @@ import { DB_NAME } from '$env/static/private';
 import { getConfig } from '$lib/util/configs';
 import { ObjectId, type Document } from 'mongodb';
 import { createLookUpSlice } from '$lib/util/server';
+import { decrypt } from '$lib/util/crypto';
 
 export const load: PageServerLoad = async ({ cookies, url, params }) => {
 	const client = await clientPromise;
@@ -43,15 +44,19 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 		}
 	];
 
-	const data = await col.aggregate(pipeline).toArray();
+	const list = await col.aggregate(pipeline).toArray();
 	const [_, admin, slug, action] = url.pathname.split('/');
 	const key = `${admin}_${action}_${slug}`.replaceAll('-', '_').toUpperCase();
 	const pageConfig = await getConfig(key);
+	const data = list[0];
+	if (colName === 'configs' && data.type === 'secured') {
+		data.value = await decrypt(data.value);
+	}
 	return {
 		key,
 		pageData: {
-			data: data[0]
+			data
 		},
-		pageConfig: pageConfig
+		pageConfig
 	};
 };

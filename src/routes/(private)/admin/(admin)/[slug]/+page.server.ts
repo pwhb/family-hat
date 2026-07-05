@@ -1,9 +1,9 @@
 import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
-import { getConfig } from '$lib/util/configs';
+import { getConfig } from '$lib/server/configs';
 import type { Document, Filter } from 'mongodb';
-import { createLookUpSlice } from '$lib/util/server';
+import { createLookUpSlice } from '$lib/server/common';
 
 export const load: PageServerLoad = async ({ cookies, url, params }) => {
 	const client = await clientPromise;

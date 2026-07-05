@@ -1,12 +1,10 @@
-import { format, compareAsc } from 'date-fns';
+import { format } from 'date-fns';
 
-export const getToken = (request: Request, header = 'authorization') => {
-	const auth = request.headers.get(header);
-	if (!auth) {
-		return null;
-	}
-	return auth.split(' ')[1];
-};
+export interface LocalizedText {
+	en: string;
+	my: string;
+	[locale: string]: string;
+}
 
 export const formatDateTime = (str: string) => format(str, 'MMM d, yyyy HH:mm');
 

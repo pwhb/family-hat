@@ -1,4 +1,4 @@
-import { getConfig } from '$lib/util/configs';
+import { getConfig } from '$lib/server/configs';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ url, params }) => {
@@ -7,8 +7,7 @@ export const load: LayoutServerLoad = async ({ url, params }) => {
 		cleaned = cleaned.replace(value, key);
 	}
 	const key = `PAGE${cleaned}`.toUpperCase();
-	const page = await getConfig(key);
-	const config = await getConfig('COMMON');
+	const [page, config] = await Promise.all([getConfig(key), getConfig('COMMON')]);
 	return {
 		key,
 		config,

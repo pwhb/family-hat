@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
-import { createLookUpSlice } from '$lib/util/server';
+import { createLookUpSlice } from '$lib/server/common';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const client = await clientPromise;

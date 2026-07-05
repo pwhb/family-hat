@@ -1,5 +1,5 @@
 import { DB_NAME } from '$env/static/private';
-import { getToken } from '$lib/util/client';
+import { getToken } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 

@@ -1,7 +1,7 @@
-import { getConfig } from '$lib/util/configs';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from '../$types';
-import { checkAuth, getUserFromToken } from '$lib/util/server';
+import { getConfig } from '$lib/server/configs';
+import { getUserFromToken } from '$lib/server/common';
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
 	const token = cookies.get('admin_token');
@@ -12,9 +12,13 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 		redirect(302, '/admin');
 	}
 	if (token) {
-		const user = await getUserFromToken(token);
-		const adminConf = await getConfig('ADMIN_CONFIG');
-		return { user, adminConf };
+		const [user, adminConf, config] = await Promise.all([
+			getUserFromToken(token),
+			getConfig('ADMIN_CONFIG'),
+			getConfig('COMMON')
+		]);
+
+		return { user, adminConf, config };
 	}
 	return {};
 };

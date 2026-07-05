@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { getDeepValue } from '$lib/util/client';
+	import { getDeepValue } from '$lib/client/common';
 </script>
 
 <div class="grid grid-cols-2 gap-10 p-10">

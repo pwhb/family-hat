@@ -1,10 +1,10 @@
 import { APP_ID, DB_NAME, MODE } from '$env/static/private';
-import { checkAuth } from '$lib/util/server';
+import { checkAuth, colList } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Filter } from 'mongodb';
 import { hash } from 'bcrypt';
-import { encrypt } from '$lib/util/crypto';
+import { encrypt } from '$lib/server/crypto';
 
 export const GET: RequestHandler = async ({ params, request, url, cookies }) => {
 	try {
@@ -17,6 +17,9 @@ export const GET: RequestHandler = async ({ params, request, url, cookies }) => 
 		}
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
+		if (!colList.includes(colName)) {
+			return json({ message: 'Not Found' }, { status: 404 });
+		}
 		const col = client.db(DB_NAME).collection(colName);
 		const query: Filter<any> = { isActive: true };
 		url.searchParams.forEach((value, key) => {
@@ -68,6 +71,9 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 		const body = await request.json();
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
+		if (!colList.includes(colName)) {
+			return json({ message: 'Not Found' }, { status: 404 });
+		}
 		const col = client.db(DB_NAME).collection(colName);
 		if (colName === 'members') {
 			// members

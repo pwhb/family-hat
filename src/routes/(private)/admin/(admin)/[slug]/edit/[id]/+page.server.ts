@@ -1,10 +1,10 @@
 import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
-import { getConfig } from '$lib/util/configs';
+import { getConfig } from '$lib/server/configs';
 import { ObjectId, type Document } from 'mongodb';
-import { createLookUpSlice } from '$lib/util/server';
-import { decrypt } from '$lib/util/crypto';
+import { createLookUpSlice } from '$lib/server/common';
+import { decrypt } from '$lib/server/crypto';
 
 export const load: PageServerLoad = async ({ cookies, url, params }) => {
 	const client = await clientPromise;

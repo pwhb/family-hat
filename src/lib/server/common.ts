@@ -1,9 +1,28 @@
 import { DB_NAME, MODE, ROOT_TOKEN, SECRET_KEY } from '$env/static/private';
 import clientPromise from '$lib/db';
-import { getToken } from '$lib/util/client';
 import type { Cookies } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Document } from 'mongodb';
+
+export const colList = [
+	'configs',
+	'families',
+	'logs',
+	'members',
+	'users',
+	'questions',
+	'relationships',
+	'relation_types'
+];
+
+export const getToken = (request: Request, header = 'authorization') => {
+	const auth = request.headers.get(header);
+	if (!auth) {
+		return null;
+	}
+	return auth.split(' ')[1];
+};
+
 export const checkAuth = async (request: Request, cookies: Cookies) => {
 	let token = cookies.get('admin_token');
 	if (!token && MODE === 'dev') {

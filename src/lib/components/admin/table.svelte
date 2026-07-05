@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/state';
-	import { formatDateTime, getDeepValue } from '$lib/util/client';
+	import { formatDateTime, getDeepValue } from '$lib/client/common';
 </script>
 
 <div class="overflow-x-auto">

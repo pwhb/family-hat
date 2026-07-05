@@ -8,7 +8,8 @@
 		formatDateTime,
 		getDeepValue,
 		getOptions
-	} from '$lib/util/client';
+	} from '$lib/client/common';
+	import Upload from './upload.svelte';
 	const mode = page.url.pathname.split('/')[3];
 	const data = mode === 'edit' ? page.data.pageData.data : {};
 
@@ -115,6 +116,11 @@
 							{/each}
 						</select>
 					{/await}
+				</fieldset>
+			{:else if field.inputtype === 'upload'}
+				<fieldset class="fieldset p-4">
+					<legend class="fieldset-legend">{field.name}</legend>
+					<Upload bind:value={obj[field.key]} name={field.name} />
 				</fieldset>
 			{/if}
 		{/each}

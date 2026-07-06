@@ -87,5 +87,5 @@ export const load: PageServerLoad = async ({ params }) => {
 		])
 		.toArray();
 
-	return { families, relationships };
+	return { pageData: { families, relationships } };
 };

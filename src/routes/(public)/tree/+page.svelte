@@ -4,5 +4,9 @@
 </script>
 
 <div class="flex h-[85vh]">
-	<Tree families={page.data.families} relationships={page.data.relationships} showTitle />
+	<Tree
+		families={page.data.pageData.families}
+		relationships={page.data.pageData.relationships}
+		showTitle
+	/>
 </div>

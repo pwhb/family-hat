@@ -13,7 +13,8 @@ export function fillTemplate(template: string, source: Record<string, any>): str
 	return template.replace(/\{\{(.*?)\}\}/g, (match, path) => {
 		const cleanPath = path.trim();
 		const value = cleanPath.split('.').reduce((current: any, key: string) => {
-			return current && typeof current === 'object' && key in current ? current[key] : undefined;
+			if (current === null || current === undefined) return undefined;
+			return current[key];
 		}, source);
 		return value !== undefined ? String(value) : match;
 	});

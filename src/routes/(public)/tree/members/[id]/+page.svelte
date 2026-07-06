@@ -10,12 +10,16 @@
 
 <div class="my-10 flex items-center justify-center">
 	<Hover3d>
-		<IdCard {member} {family} type="full" />
+		<IdCard
+			member={page.data.pageData.member}
+			family={page.data.pageData.families[0].family}
+			type="full"
+		/>
 	</Hover3d>
 </div>
 
 <Tree
-	families={page.data.families}
-	relationships={page.data.relationships}
+	families={page.data.pageData.families}
+	relationships={page.data.pageData.relationships}
 	focus={page.params.id}
 />

@@ -2,7 +2,7 @@
 	import { browser } from '$app/env';
 	import { page } from '$app/state';
 	import { langStore } from '$lib/store/lang';
-	const { config, page: pageConf } = page.data;
+	const { config, pageConfig } = page.data;
 	function getNextLanguage(currentLang: string): string {
 		const options = config.langOptions;
 		const index = options.findIndex((v: any) => v.value === currentLang);
@@ -11,7 +11,7 @@
 	}
 </script>
 
-{#if pageConf && pageConf.showNav}
+{#if pageConfig && pageConfig.showNav}
 	<div class="navbar bg-base-200 px-4 shadow-sm">
 		<div class="flex-1">
 			<a class="btn text-xl btn-ghost" href="/">{config.appName[$langStore]}</a>

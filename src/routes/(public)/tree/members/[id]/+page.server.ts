@@ -95,6 +95,6 @@ export const load: PageServerLoad = async ({ params }) => {
 			}
 		])
 		.toArray();
-
-	return { families, relationships };
+	const member = families[0].members.find((v: any) => v._id === params.id);
+	return { pageData: { families, relationships, member } };
 };

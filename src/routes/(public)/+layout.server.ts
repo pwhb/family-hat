@@ -7,10 +7,10 @@ export const load: LayoutServerLoad = async ({ url, params }) => {
 		cleaned = cleaned.replace(value, key);
 	}
 	const key = `PAGE${cleaned}`.toUpperCase();
-	const [page, config] = await Promise.all([getConfig(key), getConfig('COMMON')]);
+	const [pageConfig, config] = await Promise.all([getConfig(key), getConfig('COMMON')]);
 	return {
 		key,
 		config,
-		page
+		pageConfig
 	};
 };

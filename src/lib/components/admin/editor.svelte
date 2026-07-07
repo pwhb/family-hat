@@ -10,6 +10,7 @@
 		getOptions
 	} from '$lib/client/common';
 	import Upload from './upload.svelte';
+	import JsonEditor from './json_editor.svelte';
 	const mode = page.url.pathname.split('/')[3];
 	const data = mode === 'edit' ? page.data.pageData.data : {};
 
@@ -123,8 +124,31 @@
 					<Upload
 						bind:value={obj[field.key]}
 						name={field.name}
-						cropRequired={true}
-						aspectRatio={1}
+						cropRequired={field.cropRequired}
+						aspectRatio={field.aspectRatio}
+						accept={field.accept}
+					/>
+				</fieldset>
+			{:else if field.inputtype === 'config'}
+				<fieldset class="fieldset p-4">
+					<legend class="fieldset-legend">{field.name}</legend>
+					{#if obj['type'] === 'json'}
+						<JsonEditor bind:value={obj[field.key]} />
+					{:else}
+						<textarea class="textarea w-full" placeholder={field.name} bind:value={obj[field.key]}
+						></textarea>
+					{/if}
+				</fieldset>
+			{:else if field.inputtype === 'json'}
+				<fieldset class="fieldset p-4">
+					<legend class="fieldset-legend">{field.name}</legend>
+					<JsonEditor
+						bind:value={obj[field.key]}
+						json={field.json}
+						mode={field.mode}
+						statusBar={field.statusBar}
+						mainMenuBar={field.mainMenuBar}
+						navigationBar={field.navigationBar}
 					/>
 				</fieldset>
 			{/if}

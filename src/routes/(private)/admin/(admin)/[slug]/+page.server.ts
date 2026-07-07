@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 					'name.my': { $regex: q, $options: 'i' }
 				}
 			];
-		} else if (['configs', 'users'].includes(colName)) {
+		} else if (['configs', 'users', 'pages'].includes(colName)) {
 			query['$or'] = [
 				{
 					name: { $regex: q, $options: 'i' }
@@ -136,7 +136,6 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 	}
 	const count = await col.countDocuments(query);
 	const data = await col.aggregate(pipeline).toArray();
-	const [_, admin, slug] = url.pathname.split('/');
 	return {
 		pageData: {
 			page,

@@ -16,7 +16,7 @@ export const COL_LIST = [
 	'pages',
 	'menus',
 	'permissions',
-	'roles'
+	'user_roles'
 ];
 
 export const ADMIN_TOKEN = 'admin_token';

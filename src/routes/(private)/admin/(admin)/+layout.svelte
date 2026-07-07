@@ -24,8 +24,9 @@
 			</div>
 		</nav>
 		<!-- Page content here -->
-		<Breadcrumbs />
 		<Toast />
+		<div>// should have a tab manager here</div>
+		<Breadcrumbs />
 		{@render children()}
 	</div>
 	<Sidebar />

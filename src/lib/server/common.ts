@@ -25,9 +25,6 @@ export const SERVER_ENDPOINTS = {
 	LOGIN: '/admin/login'
 };
 
-export const getPath = (routeId: string) =>
-	routeId.replace(/\/\([^)]+\)/g, '').replace(/\([^)]+\)\//g, '');
-
 export function getCleanPath(
 	pathname: string,
 	routeId: string | null,

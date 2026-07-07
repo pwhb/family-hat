@@ -1,13 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from '../$types';
 import { getConfig, getPageConfig } from '$lib/server/configs';
-import {
-	ADMIN_TOKEN,
-	getCleanPath,
-	getPath,
-	getUserFromToken,
-	SERVER_ENDPOINTS
-} from '$lib/server/common';
+import { ADMIN_TOKEN, getCleanPath, getUserFromToken, SERVER_ENDPOINTS } from '$lib/server/common';
 
 export const load: LayoutServerLoad = async ({ route, cookies, url }) => {
 	const token = cookies.get(ADMIN_TOKEN);

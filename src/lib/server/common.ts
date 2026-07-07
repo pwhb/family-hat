@@ -4,7 +4,7 @@ import type { Cookies } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Document } from 'mongodb';
 
-export const colList = [
+export const COL_LIST = [
 	'configs',
 	'families',
 	'logs',
@@ -18,6 +18,12 @@ export const colList = [
 	'permissions',
 	'roles'
 ];
+
+export const ADMIN_TOKEN = 'admin_token';
+
+export const SERVER_ENDPOINTS = {
+	LOGIN: '/admin/login'
+};
 
 export const getPath = (routeId: string) =>
 	routeId.replace(/\/\([^)]+\)/g, '').replace(/\([^)]+\)\//g, '');
@@ -58,7 +64,7 @@ export const getToken = (request: Request, header = 'authorization') => {
 };
 
 export const checkAuth = async (request: Request, cookies: Cookies) => {
-	let token = cookies.get('admin_token');
+	let token = cookies.get(ADMIN_TOKEN);
 	if (!token && MODE === 'dev') {
 		token = getToken(request) as string;
 	}

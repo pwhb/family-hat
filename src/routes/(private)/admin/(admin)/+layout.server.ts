@@ -1,14 +1,20 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from '../$types';
 import { getConfig, getPageConfig } from '$lib/server/configs';
-import { getCleanPath, getPath, getUserFromToken } from '$lib/server/common';
+import {
+	ADMIN_TOKEN,
+	getCleanPath,
+	getPath,
+	getUserFromToken,
+	SERVER_ENDPOINTS
+} from '$lib/server/common';
 
 export const load: LayoutServerLoad = async ({ route, cookies, url }) => {
-	const token = cookies.get('admin_token');
-	if (!token && url.pathname !== '/admin/login') {
-		redirect(302, '/admin/login');
+	const token = cookies.get(ADMIN_TOKEN);
+	if (!token && url.pathname !== SERVER_ENDPOINTS.LOGIN) {
+		redirect(302, SERVER_ENDPOINTS.LOGIN);
 	}
-	if (token && url.pathname === '/admin/login') {
+	if (token && url.pathname === SERVER_ENDPOINTS.LOGIN) {
 		redirect(302, '/admin');
 	}
 	if (token) {
@@ -19,6 +25,12 @@ export const load: LayoutServerLoad = async ({ route, cookies, url }) => {
 			getConfig('COMMON'),
 			getPageConfig(pageUrl)
 		]);
+		if (!user) {
+			cookies.delete(ADMIN_TOKEN, {
+				path: '/'
+			});
+			return redirect(301, SERVER_ENDPOINTS.LOGIN);
+		}
 		if (!pageConfig) {
 			throw redirect(
 				307,

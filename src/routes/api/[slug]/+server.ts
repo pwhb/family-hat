@@ -1,5 +1,5 @@
 import { APP_ID, DB_NAME, MODE } from '$env/static/private';
-import { checkAuth, colList } from '$lib/server/common';
+import { checkAuth, COL_LIST } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Filter } from 'mongodb';
@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ params, request, url, cookies }) => 
 		}
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
-		if (!colList.includes(colName)) {
+		if (!COL_LIST.includes(colName)) {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		const col = client.db(DB_NAME).collection(colName);
@@ -71,7 +71,7 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 		const body = await request.json();
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
-		if (!colList.includes(colName)) {
+		if (!COL_LIST.includes(colName)) {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		const col = client.db(DB_NAME).collection(colName);

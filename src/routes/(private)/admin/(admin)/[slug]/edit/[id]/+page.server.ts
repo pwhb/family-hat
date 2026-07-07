@@ -46,17 +46,13 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 
 	const list = await col.aggregate(pipeline).toArray();
 	const [_, admin, slug, action] = url.pathname.split('/');
-	const key = `${admin}_${action}_${slug}`.replaceAll('-', '_').toUpperCase();
-	const pageConfig = await getConfig(key);
 	const data = list[0];
 	if (colName === 'configs' && data.type === 'secured') {
 		data.value = await decrypt(data.value);
 	}
 	return {
-		key,
 		pageData: {
 			data
-		},
-		pageConfig
+		}
 	};
 };

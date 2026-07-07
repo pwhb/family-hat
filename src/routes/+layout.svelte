@@ -7,7 +7,7 @@
 
 	$effect(() => {
 		if (page.data.config?.debug) {
-			console.log(`🛠️ [Debug] ${page.data.key}:`, $state.snapshot(page.data));
+			console.log(`🛠️ [Debug]:`, $state.snapshot(page.data));
 		}
 	});
 </script>

@@ -26,14 +26,7 @@
 		<!-- Page content here -->
 		<Breadcrumbs />
 		<Toast />
-		{#if page.data.pageConfig}
-			{@render children()}
-		{:else}
-			<div class="m-10 rounded-2xl border border-dashed p-4 text-center text-error">
-				<p>Please configure page config first. [{page.data.key}]</p>
-			</div>
-		{/if}
+		{@render children()}
 	</div>
-
 	<Sidebar />
 </div>

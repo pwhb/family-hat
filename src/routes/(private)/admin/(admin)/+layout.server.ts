@@ -1,9 +1,9 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from '../$types';
-import { getConfig } from '$lib/server/configs';
-import { getUserFromToken } from '$lib/server/common';
+import { getConfig, getPageConfig } from '$lib/server/configs';
+import { getCleanPath, getPath, getUserFromToken } from '$lib/server/common';
 
-export const load: LayoutServerLoad = async ({ cookies, url }) => {
+export const load: LayoutServerLoad = async ({ route, cookies, url }) => {
 	const token = cookies.get('admin_token');
 	if (!token && url.pathname !== '/admin/login') {
 		redirect(302, '/admin/login');
@@ -12,13 +12,20 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 		redirect(302, '/admin');
 	}
 	if (token) {
-		const [user, adminConf, config] = await Promise.all([
+		const pageUrl = getCleanPath(url.pathname, route.id);
+		const [user, adminConf, config, pageConfig] = await Promise.all([
 			getUserFromToken(token),
 			getConfig('ADMIN_CONFIG'),
-			getConfig('COMMON')
+			getConfig('COMMON'),
+			getPageConfig(pageUrl)
 		]);
-
-		return { user, adminConf, config };
+		if (!pageConfig) {
+			throw redirect(
+				307,
+				`/error/missing-config?from=${encodeURIComponent(`${url.pathname}${url.search}`)}`
+			);
+		}
+		return { user, adminConf, config, pageConfig };
 	}
 	return {};
 };

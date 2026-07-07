@@ -9,8 +9,6 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({}) => {
 	const client = await clientPromise;
-	const key = 'ADMIN_DASHBOARD';
-	const pageConfig = await getConfig(key);
 	const colList = ['members', 'families', 'relation_types', 'relationships'];
 	const pageData: any = {};
 	const promises = colList.map(async (colName) => {
@@ -24,9 +22,7 @@ export const load: PageServerLoad = async ({}) => {
 	await Promise.all(promises);
 
 	return {
-		key,
-		pageData,
-		pageConfig
+		pageData
 	};
 };
 

@@ -12,8 +12,42 @@ export const colList = [
 	'users',
 	'questions',
 	'relationships',
-	'relation_types'
+	'relation_types',
+	'pages',
+	'menus',
+	'permissions',
+	'roles'
 ];
+
+export const getPath = (routeId: string) =>
+	routeId.replace(/\/\([^)]+\)/g, '').replace(/\([^)]+\)\//g, '');
+
+export function getCleanPath(
+	pathname: string,
+	routeId: string | null,
+	preserve = ['slug']
+): string {
+	if (!routeId) return pathname;
+
+	const preserveSet = new Set(preserve);
+	const pathSegments = pathname.split('/').filter(Boolean);
+
+	const routeSegments = routeId.split('/').filter((s) => s && !s.startsWith('('));
+
+	return (
+		'/' +
+		pathSegments
+			.map((segment, i) => {
+				const routeSegment = routeSegments[i];
+				if (routeSegment?.startsWith('[') && routeSegment.endsWith(']')) {
+					const paramName = routeSegment.slice(1, -1);
+					return preserveSet.has(paramName) ? segment : `{${paramName}}`;
+				}
+				return segment;
+			})
+			.join('/')
+	);
+}
 
 export const getToken = (request: Request, header = 'authorization') => {
 	const auth = request.headers.get(header);

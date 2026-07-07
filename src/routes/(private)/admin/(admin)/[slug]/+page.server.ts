@@ -137,16 +137,12 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 	const count = await col.countDocuments(query);
 	const data = await col.aggregate(pipeline).toArray();
 	const [_, admin, slug] = url.pathname.split('/');
-	const key = `${admin}_list_${slug}`.replaceAll('-', '_').toUpperCase();
-	const pageConfig = await getConfig(key);
 	return {
-		key,
 		pageData: {
 			page,
 			size,
 			data,
 			count
-		},
-		pageConfig: pageConfig
+		}
 	};
 };

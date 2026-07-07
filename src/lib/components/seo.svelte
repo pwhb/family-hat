@@ -20,8 +20,8 @@
 				? fillTemplate(rawSeo.descriptionTemplate, page.data)
 				: rawSeo.description || defaultSEO.description,
 
-			ogImage: rawSeo.orImageTemplate
-				? fillTemplate(rawSeo.orImageTemplate, page.data)
+			ogImage: rawSeo.ogImageTemplate
+				? fillTemplate(rawSeo.ogImageTemplate, page.data)
 				: rawSeo.ogImage || defaultSEO.ogImage,
 			keywords: rawSeo.keywords || defaultSEO.keywords
 		};

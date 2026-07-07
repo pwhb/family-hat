@@ -120,7 +120,7 @@
 			{:else if field.inputtype === 'upload'}
 				<fieldset class="fieldset p-4">
 					<legend class="fieldset-legend">{field.name}</legend>
-					<Upload bind:value={obj[field.key]} name={field.name} />
+					<Upload bind:value={obj[field.key]} name={field.name} cropRequired={true} aspectRatio={1} />
 				</fieldset>
 			{/if}
 		{/each}

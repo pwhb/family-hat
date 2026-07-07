@@ -19,6 +19,7 @@
 		accept = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 	}: UploadProps = $props();
 
+	// Svelte 5 States
 	let image = $state<string | null>(null);
 	let crop = $state({ x: 0, y: 0 });
 	let zoom = $state(1);
@@ -28,6 +29,9 @@
 
 	let selectedFile = $state<File | null>(null);
 	let croppedPixels = $state<{ x: number; y: number; width: number; height: number } | null>(null);
+
+	// Reference element to reset the file input natively
+	let fileInputEl = $state<HTMLInputElement | null>(null);
 
 	const getCroppedImg = (
 		imageSrc: string,
@@ -81,21 +85,21 @@
 
 		selectedFile = file;
 
-		// Clean up previous URLs
 		if (image && image.startsWith('blob:')) {
 			URL.revokeObjectURL(image);
 		}
 
 		if (cropRequired) {
-			// Setup cropper workspace
 			image = URL.createObjectURL(file);
 			showCropper = true;
 		} else {
-			// Skip cropper workflow entirely and trigger raw upload directly
 			showCropper = false;
 			image = null;
 			await handleUpload();
 		}
+
+		// The Fix: Clear out input element value so uploading the same file again fires onchange
+		if (fileInputEl) fileInputEl.value = '';
 	};
 
 	const handleUpload = async () => {
@@ -105,42 +109,58 @@
 			uploading = true;
 			let uploadPayload: Blob | File = selectedFile;
 
-			// If cropping is active and coordinates exist, process the canvas slice
 			if (cropRequired && image && croppedPixels) {
 				uploadPayload = await getCroppedImg(image, croppedPixels);
 			}
 
-			// Centralized API call
 			value = await api.upload(uploadPayload);
-
-			// Post-upload UI reset
-			showCropper = false;
-			if (image && image.startsWith('blob:')) {
-				URL.revokeObjectURL(image);
-			}
-			image = null;
+			resetWorkflow();
 		} catch (e) {
 			console.error('Upload lifecycle error:', e);
 		} finally {
 			uploading = false;
 		}
 	};
+
+	const resetWorkflow = () => {
+		showCropper = false;
+		if (image && image.startsWith('blob:')) {
+			URL.revokeObjectURL(image);
+		}
+		image = null;
+		selectedFile = null;
+		croppedPixels = null;
+	};
+
+	const removeImage = () => {
+		value = '';
+		resetWorkflow();
+	};
 </script>
 
-<div class="flex flex-col gap-4">
-	{#if uploading}
-		<span class="loading loading-sm loading-bars"></span>
-	{:else}
-		<input
-			type="file"
-			class="file-input"
-			accept={accept.join(',')}
-			disabled={uploading}
-			{onchange}
-		/>
+<div class="flex w-full max-w-sm flex-col gap-4">
+	<!-- Hidden File Input -->
+	<input
+		type="file"
+		bind:this={fileInputEl}
+		class="hidden"
+		accept={accept.join(',')}
+		disabled={uploading}
+		{onchange}
+	/>
 
-		{#if cropRequired && showCropper && image}
-			<div class="relative h-64 w-md overflow-hidden rounded-2xl bg-neutral shadow-inner">
+	{#if uploading}
+		<!-- Loading State -->
+		<div
+			class="bg-base-50 flex w-64 flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 p-8"
+		>
+			<span class="loading mb-2 loading-lg loading-bars text-primary"></span>
+			<p class="text-sm text-base-content/70">Uploading ...</p>
+		</div>
+	{:else if showCropper && image}
+		<!-- Cropper State: Buttons are placed SAFELY below the interactive workspace -->
+		<div class="flex flex-col gap-3">
+			<div class="relative h-64 w-full overflow-hidden rounded-2xl bg-neutral shadow-inner">
 				<Cropper
 					{image}
 					bind:crop
@@ -152,36 +172,59 @@
 				/>
 			</div>
 			<div class="flex justify-end gap-2">
+				<button type="button" class="btn btn-ghost btn-sm" onclick={resetWorkflow}> Cancel </button>
 				<button
 					type="button"
-					class="btn btn-ghost"
-					onclick={() => {
-						showCropper = false;
-						image = null;
-					}}
-					disabled={uploading}
-				>
-					Cancel
-				</button>
-				<button
-					type="button"
-					class="btn btn-primary"
-					disabled={uploading || !croppedPixels}
+					class="btn btn-sm btn-primary"
+					disabled={!croppedPixels}
 					onclick={handleUpload}
 				>
-					{uploading ? 'Processing & Uploading...' : 'Save & Upload'}
+					Save & Upload
 				</button>
 			</div>
-		{/if}
+		</div>
+	{:else if value}
+		<!-- Saved State: Floating Actions overlaying the image preview on hover -->
+		<div
+			class="group relative aspect-square w-64 overflow-hidden rounded-2xl border border-base-200 bg-base-100 p-1 shadow-md"
+		>
+			<img
+				src={`${page.data.config.s3BaseUrl}/${value}`}
+				alt={name}
+				class="h-full w-full rounded-xl object-cover transition-all duration-200 group-hover:scale-105 group-hover:blur-[2px] group-hover:brightness-75"
+			/>
 
-		{#if value && !uploading && !showCropper}
-			<div class="max-w-xs rounded-2xl border border-base-200 bg-base-100 p-2 shadow-xl">
-				<img
-					src={`${page.data.config.s3BaseUrl}/${value}`}
-					alt={name}
-					class="h-auto w-full rounded-xl object-cover"
-				/>
+			<!-- Floating overlay layout buttons inside group container -->
+			<div
+				class="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+			>
+				<button
+					type="button"
+					class="btn-glass btn w-32 shadow-md btn-sm btn-neutral"
+					onclick={() => fileInputEl?.click()}
+				>
+					Change
+				</button>
+				<button
+					type="button"
+					class="btn-glass btn w-32 shadow-md btn-sm btn-error"
+					onclick={removeImage}
+				>
+					Remove
+				</button>
 			</div>
-		{/if}
+		</div>
+	{:else}
+		<!-- Placeholder Empty State -->
+		<div
+			class="flex h-64 w-64 flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/50 p-8 text-center"
+		>
+			<div class="mb-3 text-base-content/30">
+				<img src="/upload-minimalistic-svgrepo-com.svg" alt="upload" class="h-12 w-12 opacity-40" />
+			</div>
+			<button type="button" class="btn btn-sm btn-primary" onclick={() => fileInputEl?.click()}>
+				Choose
+			</button>
+		</div>
 	{/if}
 </div>

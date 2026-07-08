@@ -41,7 +41,7 @@
 			<button
 				type="button"
 				onclick={(e) => handleClose(e, tab.id)}
-				class="btn mr-1 btn-circle flex-shrink-0 text-xs opacity-60 btn-ghost btn-xs hover:opacity-100"
+				class="btn mr-1 btn-circle shrink-0 text-xs opacity-60 btn-ghost btn-xs hover:opacity-100"
 				aria-label="Close tab"
 			>
 				✕

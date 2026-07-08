@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/inno.jpeg';
 	import Seo from '$lib/components/seo.svelte';
 	import { page } from '$app/state';
+	import NavProgress from '$lib/components/nav_progress.svelte';
 	let { children } = $props();
 
 	$effect(() => {
@@ -14,4 +15,5 @@
 
 <Seo />
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<NavProgress />
 {@render children()}

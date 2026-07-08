@@ -36,6 +36,9 @@ export const GET: RequestHandler = async ({ params, request, url, cookies }) => 
 					}
 				];
 			}
+			if (key === 'isLeaf' && value === 'true') {
+				query['url'] = '';
+			}
 		});
 		let page = url.searchParams.get('page') ? Number(url.searchParams.get('page')) : 1;
 		let size = url.searchParams.get('size') ? Number(url.searchParams.get('size')) : 10;
@@ -98,7 +101,7 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 
 		const data = await col.insertOne({
 			...body,
-			isActive: true,
+			isActive: !!body.isActive,
 			appId: APP_ID,
 			createdBy: authenticated._id,
 			createdAt: new Date(),

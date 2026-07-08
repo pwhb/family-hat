@@ -1,7 +1,6 @@
 import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
-import { getConfig } from '$lib/server/configs';
 import type { Document, Filter } from 'mongodb';
 import { createLookUpSlice } from '$lib/server/common';
 

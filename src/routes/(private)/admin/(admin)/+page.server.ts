@@ -21,7 +21,6 @@ export const load: PageServerLoad = async ({}) => {
 		pageData[colName] = { total, count };
 	});
 	await Promise.all(promises);
-
 	return {
 		pageData
 	};

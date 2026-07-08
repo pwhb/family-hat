@@ -8,6 +8,7 @@ export interface Tab {
 	pathname: string;
 	url: string;
 	label: string;
+	formData?: Record<string, any>; // <-- Added structural draft storage
 }
 
 const openTabsStorage = new LocalStorageState<Tab[]>('admin_tabs', []);
@@ -26,7 +27,6 @@ export const tabManager = {
 			.split('-')
 			.map((v) => capitalize(v))
 			.join(' ');
-
 		let queryContext = '';
 		if (search) {
 			const params = new URLSearchParams(search);
@@ -41,7 +41,6 @@ export const tabManager = {
 
 	syncRoute(pathname: string, fullUrl: string, search: string) {
 		if (pathname === '/admin') return;
-
 		const existingTab = openTabsStorage.value.find((t) => t.pathname === pathname);
 
 		if (!existingTab) {
@@ -57,6 +56,19 @@ export const tabManager = {
 		}
 	},
 
+	// A reactive getter to fish out the draft state of whatever tab is active
+	get currentTabDraft() {
+		return openTabsStorage.value.find((t) => t.pathname === page.url.pathname)?.formData;
+	},
+
+	// Method for form components to save their inputs continuously
+	updateCurrentDraft(data: Record<string, any>) {
+		const currentTab = openTabsStorage.value.find((t) => t.pathname === page.url.pathname);
+		if (currentTab) {
+			currentTab.formData = data;
+		}
+	},
+
 	async closeTab(id: string, customRedirectUrl?: string) {
 		const index = openTabsStorage.value.findIndex((t) => t.id === id);
 		if (index === -1) return;
@@ -69,12 +81,9 @@ export const tabManager = {
 		} else if (isCurrentPage) {
 			const remaining = openTabsStorage.value.filter((t) => t.id !== id);
 			let fallbackUrl = '/admin';
-
 			if (remaining.length > 0) {
-				const nextIndex = Math.min(index, remaining.length - 1);
-				fallbackUrl = remaining[nextIndex].url;
+				fallbackUrl = remaining[Math.min(index, remaining.length - 1)].url;
 			}
-
 			await goto(fallbackUrl);
 		}
 

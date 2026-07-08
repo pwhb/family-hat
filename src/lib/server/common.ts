@@ -25,6 +25,8 @@ export const SERVER_ENDPOINTS = {
 	LOGIN: '/admin/login'
 };
 
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export function getCleanPath(
 	pathname: string,
 	routeId: string | null,

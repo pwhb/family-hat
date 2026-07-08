@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import type { LocalizedText } from '$lib/client/common';
-	import { langStore } from '$lib/store/lang';
+	import { lang } from '$lib/store/lang.svelte';
 
 	interface MemberProps {
 		_id: string;
@@ -58,7 +58,7 @@
 					>
 						<img
 							src={`${page.data.config.s3BaseUrl}/${member.avatarUrl}`}
-							alt={member.name[$langStore]}
+							alt={member.name[lang.value]}
 						/>
 					</div>
 				{:else}
@@ -69,7 +69,7 @@
 							src={page.data.config.avatarPlaceholder[
 								member.gender ? member.gender.toLowerCase() : 'neutral'
 							]}
-							alt={member.name[$langStore]}
+							alt={member.name[lang.value]}
 						/>
 					</div>
 				{/if}
@@ -79,13 +79,13 @@
 				<h2
 					class={`${focus && focus === member._id ? 'text-accent underline' : ''} ${getCustomClass().name}`}
 				>
-					{member.name[$langStore]}
+					{member.name[lang.value]}
 					{#if family.center === member._id}
 						<span class="text-lg" title="Family Center">👑</span>
 					{/if}
 				</h2>
 				<p class={getCustomClass().title}>
-					{member.title[$langStore]}
+					{member.title[lang.value]}
 				</p>
 			</div>
 
@@ -97,7 +97,7 @@
 						<span class="block text-[10px] font-bold tracking-widest uppercase opacity-40"
 							>House</span
 						>
-						<span class="text-sm font-bold text-base-content/90">{family.fullName[$langStore]}</span
+						<span class="text-sm font-bold text-base-content/90">{family.fullName[lang.value]}</span
 						>
 					</div>
 

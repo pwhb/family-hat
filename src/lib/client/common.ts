@@ -6,6 +6,8 @@ export interface LocalizedText {
 	[locale: string]: string;
 }
 
+export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export const formatDateTime = (str: string) => format(str, 'MMM d, yyyy HH:mm');
 
 export function fillTemplate(template: string, source: Record<string, any>): string {

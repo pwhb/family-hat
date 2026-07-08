@@ -109,14 +109,38 @@ export const createLookUpSlice = ({
 	as: string;
 	opts?: any;
 }) => {
+	const conversionExpression =
+		opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` };
+
+	const safeSearchId = {
+		$cond: {
+			if: {
+				$and: [{ $not: [{ $not: [`$${localField}`] }] }, { $ne: [`$${localField}`, ''] }]
+			},
+			then: conversionExpression,
+			else: '$$REMOVE'
+		}
+	};
+
 	const slice: Document[] = [
 		{
 			$lookup: {
 				from,
 				let: {
-					searchId: opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` }
+					searchId: safeSearchId
 				},
-				pipeline: [{ $match: { $expr: { $eq: [`$${foreignField}`, '$$searchId'] } } }],
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{ $ifNull: ['$$searchId', false] },
+									{ $eq: [`$${foreignField}`, '$$searchId'] }
+								]
+							}
+						}
+					}
+				],
 				as
 			}
 		},
@@ -127,8 +151,10 @@ export const createLookUpSlice = ({
 			}
 		}
 	];
+
 	if (opts && opts.project) {
 		slice[0].$lookup.pipeline = [...slice[0].$lookup.pipeline, { $project: opts.project }];
 	}
+
 	return slice;
 };

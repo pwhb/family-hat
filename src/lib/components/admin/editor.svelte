@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toastManager } from '$lib/toast.svelte';
 	import {
@@ -11,11 +10,12 @@
 	} from '$lib/client/common';
 	import Upload from './upload.svelte';
 	import JsonEditor from './json_editor.svelte';
+	import { tabManager } from '$lib/store/tabs.svelte';
 	const mode = page.url.pathname.split('/')[3];
 	const data = mode === 'edit' ? page.data.pageData.data : {};
 
 	let obj = $state(buildEditableObj(page.data.pageConfig?.fields, data));
-	const onsubmit = async () => {
+	const onsubmit = async (e: Event) => {
 		try {
 			const submitConf = page.data.pageConfig.submit;
 			const res = await fetch(fillTemplate(submitConf.url, data), {
@@ -35,7 +35,11 @@
 				});
 
 				const [_, admin, slug] = page.url.pathname.split('/');
-				goto(`/${admin}/${slug}?page=1&size=10`);
+				const targetUrl = `/${admin}/${slug}?page=1&size=10`;
+				const formTab = tabManager.list.find((t) => t.pathname === page.url.pathname);
+				if (formTab) {
+					tabManager.closeTab(formTab.id, targetUrl);
+				}
 			} else {
 				throw Error(resJSON && resJSON.message ? resJSON.message : 'Error');
 			}

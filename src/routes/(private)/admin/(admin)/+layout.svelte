@@ -1,8 +1,8 @@
 <script>
-	import { page } from '$app/state';
 	import Breadcrumbs from '$lib/components/admin/breadcrumbs.svelte';
 	import Search from '$lib/components/admin/search.svelte';
 	import Sidebar from '$lib/components/admin/sidebar.svelte';
+	import TabsManager from '$lib/components/admin/tabs_manager.svelte';
 	import Toast from '$lib/components/toast.svelte';
 	let { children } = $props();
 </script>
@@ -25,7 +25,7 @@
 		</nav>
 		<!-- Page content here -->
 		<Toast />
-		<div>// should have a tab manager here</div>
+		<TabsManager />
 		<Breadcrumbs />
 		{@render children()}
 	</div>

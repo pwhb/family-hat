@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { langStore } from '$lib/store/lang';
 	import { onMount } from 'svelte';
 	import Hover3d from './hover3d.svelte';
 	import IdCard from './id_card.svelte';
+	import { lang } from '$lib/store/lang.svelte';
 
 	const getLevels = (list: any[]) => {
 		return Object.entries(
@@ -81,7 +81,7 @@
 
 				return {
 					pathData,
-					label: rel.sourceLabel[$langStore]
+					label: rel.sourceLabel[lang.value]
 				};
 			})
 			.filter(Boolean);
@@ -127,7 +127,7 @@
 	}
 
 	$effect(() => {
-		const _lang = $langStore;
+		const _lang = lang.value;
 		const _families = families;
 		const _relationships = relationships;
 		requestPathUpdate();
@@ -195,7 +195,7 @@
 			<div class="flex w-max flex-col items-center justify-center px-10">
 				{#if showTitle}
 					<h1 class="mb-24 text-2xl font-bold text-gray-800">
-						{item.family.fullName[$langStore]}
+						{item.family.fullName[lang.value]}
 					</h1>
 				{/if}
 				<div class="flex w-max flex-col items-center gap-24">

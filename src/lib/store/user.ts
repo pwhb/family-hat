@@ -1,3 +1,3 @@
-import { createLocalStorageStore } from './store';
+import { createLocalStorageStore } from './local.svelte';
 
 export const userIdStore = createLocalStorageStore('userId', '');

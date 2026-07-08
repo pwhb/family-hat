@@ -108,6 +108,17 @@ export const load: PageServerLoad = async ({ cookies, url, params }) => {
 		if (matchIndex !== -1) {
 			pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
 		}
+	} else if (colName === 'menus') {
+		const lookupSlice = createLookUpSlice({
+			from: 'menus',
+			localField: 'parentID',
+			foreignField: '_id',
+			as: 'parent'
+		});
+		const matchIndex = pipeline.findIndex((stage) => '$match' in stage);
+		if (matchIndex !== -1) {
+			pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
+		}
 	} else if (colName === 'relationships') {
 		const lookupSlice = [
 			...createLookUpSlice({

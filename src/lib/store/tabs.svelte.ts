@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
-import { capitalize } from '$lib/client/common';
+import { capitalize, getEntityName } from '$lib/client/common';
 import { LocalStorageState } from './local.svelte';
 
 export interface Tab {
@@ -21,9 +21,9 @@ export const tabManager = {
 	generateLabel(pathname: string, search: string): string {
 		const segments = pathname.split('/').filter(Boolean);
 		if (segments.length <= 1) return 'Dashboard';
-		const [_, scope, action, id] = segments;
+		const [_, slug, action, id] = segments;
 
-		const entityName = scope
+		const entityName = slug
 			.split('-')
 			.map((v) => capitalize(v))
 			.join(' ');
@@ -35,7 +35,7 @@ export const tabManager = {
 		}
 
 		return action
-			? `${capitalize(action)} ${entityName.replace(/s$/, '')}${id ? ` [${id}]` : ''}`
+			? `${capitalize(action)} ${getEntityName(slug)}${id ? ` [${id}]` : ''}`
 			: `${entityName}${queryContext}`;
 	},
 

@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import { JSONEditor, Mode, type Content, type OnChange } from 'svelte-jsoneditor';
 
-	interface UploadProps {
+	interface Props {
 		value?: string | object | unknown[] | null;
 		json?: boolean;
 		mode?: Mode;
@@ -18,7 +18,7 @@
 		mainMenuBar,
 		navigationBar,
 		statusBar
-	}: UploadProps = $props();
+	}: Props = $props();
 
 	function parseToNative(val: any): any {
 		if (typeof val === 'string') {

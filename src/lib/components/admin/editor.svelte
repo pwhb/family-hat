@@ -14,6 +14,8 @@
 	import { tabManager } from '$lib/store/tabs.svelte';
 	import TreeCheckboxGroup from './tree_checkbox_group.svelte';
 	import { buildTree } from '$lib/client/tree';
+	import MultiSelect from './multi_select.svelte';
+	import { onMount } from 'svelte';
 	const mode = page.url.pathname.split('/')[3];
 	const data = mode === 'edit' ? page.data.pageData.data : {};
 	const [_, admin, slug] = page.url.pathname.split('/');
@@ -52,6 +54,27 @@
 			});
 		}
 	};
+
+	let optionsCache = $state<Record<string, any[]>>({});
+
+	// Safely execute asynchronous lookups only when rendering in the browser
+	onMount(() => {
+		for (const field of page.data.pageConfig.fields) {
+			if (['select', 'tree-selector', 'multi-select'].includes(field.inputtype) && field.options) {
+				// Initialize as loading/empty state
+				optionsCache[field.key] = [];
+
+				// Fetch the options cleanly on the client side
+				getOptions(field.options)
+					.then((resolvedOptions) => {
+						optionsCache[field.key] = resolvedOptions || [];
+					})
+					.catch((err) => {
+						console.error(`Failed to load options for ${field.key}:`, err);
+					});
+			}
+		}
+	});
 </script>
 
 <form {onsubmit} class="m-4 mt-0 fieldset rounded-box border border-base-300 bg-base-200 p-4">
@@ -99,13 +122,22 @@
 			{:else if field.inputtype === 'checkbox'}
 				<input type="checkbox" bind:checked={obj[field.key]} class="toggle" />
 			{:else if field.inputtype === 'select'}
-				{#await getOptions(field.options) then options}
+				{#if optionsCache[field.key] && optionsCache[field.key].length}
 					<select class="select" bind:value={obj[field.key]}>
-						{#each options as option}
+						{#each optionsCache[field.key] as option}
 							<option value={option.value}>{option.label}</option>
 						{/each}
 					</select>
-				{/await}
+				{/if}
+			{:else if field.inputtype === 'tree-selector'}
+				{#if optionsCache[field.key] && optionsCache[field.key].length}
+					<TreeCheckboxGroup
+						bind:checkedValues={obj[field.key]}
+						nodes={buildTree(optionsCache[field.key])}
+					/>
+				{/if}
+			{:else if field.inputtype === 'multi-select'}
+				<MultiSelect bind:selectedValues={obj[field.key]} options={optionsCache[field.key]} />
 			{:else if field.inputtype === 'upload'}
 				<Upload
 					bind:value={obj[field.key]}
@@ -130,10 +162,6 @@
 					mainMenuBar={field.mainMenuBar}
 					navigationBar={field.navigationBar}
 				/>
-			{:else if field.inputtype === 'tree-selector'}
-				{#await getOptions(field.options) then options}
-					<TreeCheckboxGroup bind:checkedValues={obj[field.key]} nodes={buildTree(options)} />
-				{/await}
 			{/if}
 		</fieldset>
 	{/each}

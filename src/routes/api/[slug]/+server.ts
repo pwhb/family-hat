@@ -81,6 +81,8 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
 		if (colName === 'members') {
 			// members
 			body.code = body.name.en.replace(/\s/g, '_').toUpperCase();
+		} else if (['user_roles'].includes(colName)) {
+			body.code = body.name.replace(/\s/g, '_').toUpperCase();
 		} else if (colName === 'questions') {
 			// questions
 			if (body.options && body.options.length) {

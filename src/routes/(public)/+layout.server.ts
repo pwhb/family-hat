@@ -1,4 +1,4 @@
-import { getCleanPath, getPath } from '$lib/server/common';
+import { getCleanPath } from '$lib/server/common';
 import { getConfig, getPageConfig } from '$lib/server/configs';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';

@@ -15,11 +15,33 @@
 	import TreeCheckboxGroup from './tree_checkbox_group.svelte';
 	import { buildTree } from '$lib/client/tree';
 	import MultiSelect from './multi_select.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
+
+	const [_, admin, slug] = page.url.pathname.split('/');
 	const mode = page.url.pathname.split('/')[3];
 	const data = mode === 'edit' ? page.data.pageData.data : {};
-	const [_, admin, slug] = page.url.pathname.split('/');
-	let obj = $state(buildEditableObj(page.data.pageConfig?.fields, data));
+
+	let obj = $state<Record<string, any>>(
+		tabManager.currentTabDraft || buildEditableObj(page.data.pageConfig?.fields, data)
+	);
+
+	$effect(() => {
+		const path = page.url.pathname;
+		untrack(() => {
+			obj = tabManager.currentTabDraft || buildEditableObj(page.data.pageConfig?.fields, data);
+		});
+	});
+
+	$effect.pre(() => {
+		const currentData = $state.snapshot(obj);
+
+		if (Object.keys(currentData).length > 0) {
+			untrack(() => {
+				tabManager.updateCurrentDraft(currentData);
+			});
+		}
+	});
+
 	const onsubmit = async (e: Event) => {
 		try {
 			const submitConf = page.data.pageConfig.submit;
@@ -57,14 +79,11 @@
 
 	let optionsCache = $state<Record<string, any[]>>({});
 
-	// Safely execute asynchronous lookups only when rendering in the browser
 	onMount(() => {
 		for (const field of page.data.pageConfig.fields) {
 			if (['select', 'tree-selector', 'multi-select'].includes(field.inputtype) && field.options) {
-				// Initialize as loading/empty state
 				optionsCache[field.key] = [];
 
-				// Fetch the options cleanly on the client side
 				getOptions(field.options)
 					.then((resolvedOptions) => {
 						optionsCache[field.key] = resolvedOptions || [];
@@ -148,7 +167,7 @@
 				/>
 			{:else if field.inputtype === 'config'}
 				{#if obj['type'] === 'json'}
-					<JsonEditor bind:value={obj[field.key]} />
+					<!-- <JsonEditor 	 bind:value={obj[field.key]} /> -->
 				{:else}
 					<textarea class="textarea w-full" placeholder={field.name} bind:value={obj[field.key]}
 					></textarea>

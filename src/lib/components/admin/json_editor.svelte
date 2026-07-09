@@ -49,7 +49,7 @@
 
 	// Initialize editor state
 	let content: Content = $state(untrack(() => toEditorContent(value, json)));
-	// Sync external changes down to the editor accurately
+
 	$effect(() => {
 		const currentExternal = value;
 		const currentJsonProp = json;

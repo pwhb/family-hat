@@ -40,6 +40,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			{
 				$project: {
 					members: 1,
+					'family._id': 1,
 					'family.name': 1,
 					'family.code': 1,
 					'family.fullName': 1,

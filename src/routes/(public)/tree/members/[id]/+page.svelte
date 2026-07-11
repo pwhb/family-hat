@@ -2,10 +2,9 @@
 	import { page } from '$app/state';
 	import Hover3d from '$lib/components/hover3d.svelte';
 	import IdCard from '$lib/components/id_card.svelte';
-	import Tree from '$lib/components/tree.svelte';
-	const familyData = $derived(page.data.families?.[0]);
-	const member = $derived(familyData?.members?.find((v: any) => v._id === page.params.id));
-	const family = $derived(familyData?.family);
+	import InterFamilyTreeGroup from '$lib/components/inter_family_tree_group.svelte';
+	import IsolatedFamilyTreeGroup from '$lib/components/isolated_family_tree_group.svelte';
+
 </script>
 
 <div class="my-10 flex items-center justify-center">
@@ -18,8 +17,16 @@
 	</Hover3d>
 </div>
 
-<Tree
-	families={page.data.pageData.families}
-	relationships={page.data.pageData.relationships}
-	focus={page.params.id}
-/>
+{#if page.data.pageConfig.view === 'InterFamilyTreeGroup'}
+	<InterFamilyTreeGroup
+		families={page.data.pageData.families}
+		relationships={page.data.pageData.relationships}
+		focus={page.params.id}
+	/>
+{:else}
+	<IsolatedFamilyTreeGroup
+		families={page.data.pageData.families}
+		relationships={page.data.pageData.relationships}
+		focus={page.params.id}
+	/>
+{/if}

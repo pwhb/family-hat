@@ -15,7 +15,7 @@
 {#if pageConfig && pageConfig.showNav}
 	<div class="navbar bg-base-200 px-4 shadow-sm">
 		<div class="flex-1">
-			<a class="btn text-xl btn-ghost" href="/">{config.appName[lang.value]}</a>
+			<a class="text-lg" href="/">{config.appName[lang.value]}</a>
 		</div>
 		<div class="flex-none">
 			{#if browser}

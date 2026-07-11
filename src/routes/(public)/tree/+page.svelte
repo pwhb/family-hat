@@ -11,7 +11,7 @@
 			relationships={page.data.pageData.relationships}
 			showTitle
 		/>
-	{:else}
+	{:else if page.data.pageConfig.view === 'IsolatedFamilyTreeGroup'}
 		<IsolatedFamilyTreeGroup
 			families={page.data.pageData.families}
 			relationships={page.data.pageData.relationships}

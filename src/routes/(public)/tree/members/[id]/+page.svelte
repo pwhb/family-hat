@@ -4,7 +4,6 @@
 	import IdCard from '$lib/components/id_card.svelte';
 	import InterFamilyTreeGroup from '$lib/components/inter_family_tree_group.svelte';
 	import IsolatedFamilyTreeGroup from '$lib/components/isolated_family_tree_group.svelte';
-
 </script>
 
 <div class="my-10 flex items-center justify-center">

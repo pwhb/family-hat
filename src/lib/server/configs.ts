@@ -11,8 +11,7 @@ interface IConfig {
 export const getPageConfig = async (url: string) => {
 	const client = await clientPromise;
 	const col = client.db(DB_NAME).collection('pages');
-	const data = await col.findOne({ url });
-	return data && data.configs;
+	return await col.findOne({ url });
 };
 
 const getConfigFromDB = async (key: string) => {

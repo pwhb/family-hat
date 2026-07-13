@@ -1,3 +1,3 @@
-import { createLocalStorageStore } from './local.svelte';
+import { LocalStorageState } from './local.svelte';
 
-export const userIdStore = createLocalStorageStore('userId', '');
+export const userId = new LocalStorageState<string>('userId', 'en');

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	const { user, adminConf } = page.data;
+	const { user, adminConfig } = page.data;
 </script>
 
 <div class="drawer-side is-drawer-close:overflow-visible">
@@ -19,7 +19,7 @@
 					<span class="is-drawer-close:hidden">Dashboard</span>
 				</a>
 			</li>
-			{#each adminConf.sidebarMenus as menu}
+			{#each adminConfig.sidebarMenus as menu}
 				<li>
 					<a href={menu.url} class="is-drawer-close:hidden">
 						<span class="is-drawer-close:hidden">{menu.label}</span>

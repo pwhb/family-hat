@@ -12,6 +12,12 @@ export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 export const formatDateTime = (str: string) => format(str, 'MMM d, yyyy HH:mm');
 
 export const getEntityName = (slug: string) => ENTITY_NAME_MAP[slug.replaceAll('-', '_')];
+
+export function isTemplateString(str: string): boolean {
+	if (!str) return false;
+	const templateRegex = /\{\{.*?\}\}/;
+	return templateRegex.test(str);
+}
 export function fillTemplate(template: string, source: Record<string, any>): string {
 	if (!template || !source) return template;
 	return template.replace(/\{\{(.*?)\}\}/g, (match, path) => {
@@ -57,7 +63,9 @@ export const getOptions = async ({
 				Object.fromEntries(
 					Object.entries(mapping).map(([targetKey, sourcePath]) => [
 						targetKey,
-						getDeepValue(item, sourcePath)
+						isTemplateString(sourcePath)
+							? fillTemplate(sourcePath, item)
+							: getDeepValue(item, sourcePath)
 					])
 				)
 			);

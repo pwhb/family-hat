@@ -1,5 +1,5 @@
 import { redirect, type Handle } from '@sveltejs/kit';
-import { getCleanPath } from '../common';
+import { getCleanPath, SERVER_ENDPOINTS } from '../common';
 import { getConfig, getPageConfig } from '../configs';
 
 const ROUTE_WHITELIST = ['login', 'error', 'api'];
@@ -8,8 +8,8 @@ export const globalGuard: Handle = async ({ event, resolve }) => {
 	locals.pageUrl = getCleanPath(url.pathname, route.id);
 
 	const [_, identifier] = locals.pageUrl.split('/');
-	if (ROUTE_WHITELIST.includes(identifier)) {
-		locals.identifier = identifier;
+	locals.identifier = identifier;
+	if (ROUTE_WHITELIST.includes(identifier) || locals.pageUrl === SERVER_ENDPOINTS.LOGIN) {
 		return resolve(event);
 	}
 	const [pageConfig, config, adminConfig] = await Promise.all([
@@ -24,7 +24,9 @@ export const globalGuard: Handle = async ({ event, resolve }) => {
 		);
 	}
 	locals.config = config;
-	locals.pageConfig = pageConfig;
+	locals.pageConfig = pageConfig.configs;
+	locals.isPublic = pageConfig.isPublic;
 	locals.adminConfig = adminConfig;
+
 	return resolve(event);
 };

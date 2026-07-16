@@ -22,8 +22,11 @@ export const COL_LIST = [
 export const ADMIN_TOKEN = 'admin_token';
 
 export const SERVER_ENDPOINTS = {
-	LOGIN: '/admin/login'
+	LOGIN: '/login',
+	MISSING_CONFIG_ERROR: '/error/missing-config'
 };
+
+export const SKIP_REDIRECT_ROUTES = [SERVER_ENDPOINTS.LOGIN, SERVER_ENDPOINTS.MISSING_CONFIG_ERROR];
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

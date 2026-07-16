@@ -152,7 +152,7 @@
 				{#if optionsCache[field.key] && optionsCache[field.key].length}
 					<TreeCheckboxGroup
 						bind:checkedValues={obj[field.key]}
-						nodes={buildTree(optionsCache[field.key])}
+						nodes={buildTree(optionsCache[field.key], field.options.config)}
 					/>
 				{/if}
 			{:else if field.inputtype === 'multi-select'}

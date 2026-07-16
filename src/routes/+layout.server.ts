@@ -1,0 +1,20 @@
+import { redirect } from '@sveltejs/kit';
+
+import { SERVER_ENDPOINTS, SKIP_REDIRECT_ROUTES } from '$lib/server/common';
+import type { LayoutServerLoad } from './$types';
+
+export const load: LayoutServerLoad = async ({ url, locals }) => {
+	const { pathname } = url;
+	if (!locals.isPublic) {
+		if (!locals.user && !SKIP_REDIRECT_ROUTES.includes(pathname))
+			return redirect(302, SERVER_ENDPOINTS.LOGIN);
+		if (locals.user && pathname === SERVER_ENDPOINTS.LOGIN) return redirect(302, '/admin');
+	}
+	const { user, config, pageConfig, adminConfig } = locals;
+	return {
+		config,
+		pageConfig,
+		...(!!user && { user }),
+		...(!!adminConfig && { adminConfig })
+	};
+};

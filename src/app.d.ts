@@ -10,6 +10,7 @@ declare global {
 			user: any;
 			identifier: string;
 			pageUrl: string;
+			isPublic: boolean;
 		}
 		// interface PageData {}
 		// interface PageState {}

@@ -1,6 +1,7 @@
 import { redirect, type Handle } from '@sveltejs/kit';
-import { getCleanPath, SERVER_ENDPOINTS } from '../common';
+import { getCleanPath } from '../common';
 import { getConfig, getPageConfig } from '../configs';
+import { SERVER_ENDPOINTS } from '$lib/consts';
 
 const ROUTE_WHITELIST = ['login', 'error', 'api'];
 export const globalGuard: Handle = async ({ event, resolve }) => {

@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
-import { ADMIN_TOKEN, getUserFromToken } from '../common';
+import { getUserFromToken } from '../common';
+import { ADMIN_TOKEN } from '$lib/consts';
 
 export const authGuard: Handle = async ({ event, resolve }) => {
 	if (event.locals.isPublic) return resolve(event);

@@ -12,3 +12,26 @@ export const ENTITY_NAME_MAP: Record<string, string> = {
 	permissions: 'Permission',
 	user_roles: 'User Role'
 };
+
+export const COL_LIST = [
+	'configs',
+	'families',
+	'logs',
+	'members',
+	'users',
+	'questions',
+	'relationships',
+	'relation_types',
+	'pages',
+	'menus',
+	'permissions',
+	'user_roles',
+	'payments'
+];
+
+export const ADMIN_TOKEN = 'admin_token';
+
+export const SERVER_ENDPOINTS = {
+	LOGIN: '/login',
+	MISSING_CONFIG_ERROR: '/error/missing-config'
+};

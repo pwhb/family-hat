@@ -4,8 +4,8 @@ import { compare } from 'bcrypt';
 import { getConfig } from '$lib/server/configs';
 import jwt from 'jsonwebtoken';
 import { redirect } from '@sveltejs/kit';
-import { ADMIN_TOKEN, SERVER_ENDPOINTS } from '$lib/server/common';
 import type { Actions, PageServerLoad } from './$types';
+import { ADMIN_TOKEN, SERVER_ENDPOINTS } from '$lib/consts';
 
 export const load: PageServerLoad = async ({}) => {
 	const client = await clientPromise;

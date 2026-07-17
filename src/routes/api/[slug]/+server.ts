@@ -1,10 +1,11 @@
 import { APP_ID, DB_NAME, MODE } from '$env/static/private';
-import { checkAuth, COL_LIST } from '$lib/server/common';
+import { checkAuth } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Filter } from 'mongodb';
 import { hash } from 'bcrypt';
 import { encrypt } from '$lib/server/crypto';
+import { COL_LIST } from '$lib/consts';
 
 export const GET: RequestHandler = async ({ params, request, url, cookies }) => {
 	try {

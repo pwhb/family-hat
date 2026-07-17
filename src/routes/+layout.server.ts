@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 
-import { SERVER_ENDPOINTS, SKIP_REDIRECT_ROUTES } from '$lib/server/common';
+import { SKIP_REDIRECT_ROUTES } from '$lib/server/common';
 import type { LayoutServerLoad } from './$types';
+import { SERVER_ENDPOINTS } from '$lib/consts';
 
 export const load: LayoutServerLoad = async ({ url, locals }) => {
 	const { pathname } = url;

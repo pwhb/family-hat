@@ -1,30 +1,9 @@
 import { DB_NAME, MODE, ROOT_TOKEN, SECRET_KEY } from '$env/static/private';
+import { ADMIN_TOKEN, SERVER_ENDPOINTS } from '$lib/consts';
 import clientPromise from '$lib/db';
 import type { Cookies } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Document } from 'mongodb';
-
-export const COL_LIST = [
-	'configs',
-	'families',
-	'logs',
-	'members',
-	'users',
-	'questions',
-	'relationships',
-	'relation_types',
-	'pages',
-	'menus',
-	'permissions',
-	'user_roles'
-];
-
-export const ADMIN_TOKEN = 'admin_token';
-
-export const SERVER_ENDPOINTS = {
-	LOGIN: '/login',
-	MISSING_CONFIG_ERROR: '/error/missing-config'
-};
 
 export const SKIP_REDIRECT_ROUTES = [SERVER_ENDPOINTS.LOGIN, SERVER_ENDPOINTS.MISSING_CONFIG_ERROR];
 

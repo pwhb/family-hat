@@ -37,8 +37,19 @@ export const GET: RequestHandler = async ({ params, request, url, cookies }) => 
 					}
 				];
 			}
-			if (key === 'isLeaf' && value === 'true') {
-				query['url'] = '';
+			if (key === 'isLeaf') {
+				if (value === 'true') {
+					query['url'] = '';
+				} else if (value === 'false') {
+					query['url'] = { $ne: '' };
+				}
+			}
+			if (key === 'isPublic') {
+				if (value === 'true') {
+					query['isPublic'] = true;
+				} else if (value === 'false') {
+					query['isPublic'] = false;
+				}
 			}
 		});
 		let page = url.searchParams.get('page') ? Number(url.searchParams.get('page')) : 1;

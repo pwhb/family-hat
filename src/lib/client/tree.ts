@@ -47,7 +47,7 @@ export function buildTree(flatData: FlatNode[], config?: TreeConfig): TreeNode[]
 		let currentLevelChildren = roots;
 
 		config.groupBy.forEach((path, index) => {
-			const rawGroupValue = getDeepValue(item, path);
+			const rawGroupValue = getDeepValue(path, item);
 			const groupValue = rawGroupValue !== undefined ? String(rawGroupValue) : 'unknown';
 
 			let existingGroupNode = currentLevelChildren.find(
@@ -82,6 +82,5 @@ export function buildTree(flatData: FlatNode[], config?: TreeConfig): TreeNode[]
 			children: []
 		});
 	}
-
 	return roots;
 }

@@ -8,9 +8,9 @@
 		<div class="stat rounded-2xl shadow-lg">
 			<div class="stat-title text-xl">{block.name}</div>
 			<div class="stat-value">
-				<span class="text-green-600">{getDeepValue(page.data.pageData, block.count)} </span>
+				<span class="text-green-600">{getDeepValue(block.count, page.data.pageData)} </span>
 				/
-				{getDeepValue(page.data.pageData, block.total)}
+				{getDeepValue(block.total, page.data.pageData)}
 			</div>
 			<div class="stat-actions">
 				<a class="btn p-4 btn-xs btn-neutral" href={block.url}>View {block.name}</a>

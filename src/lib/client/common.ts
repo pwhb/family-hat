@@ -65,7 +65,7 @@ export const getOptions = async ({
 						targetKey,
 						isTemplateString(sourcePath)
 							? fillTemplate(sourcePath, item)
-							: getDeepValue(item, sourcePath)
+							: getDeepValue(sourcePath, item)
 					])
 				)
 			);
@@ -77,7 +77,7 @@ export const getOptions = async ({
 	return [];
 };
 
-export function getDeepValue(source: any, path: string) {
+export function getDeepValue(path: string, source: any) {
 	return path.split('.').reduce((curr, key) => curr && curr[key], source);
 }
 
@@ -86,7 +86,7 @@ export function buildEditableObj(fields: any[], dataSource: any) {
 	if (!fields || !fields.length) return {};
 
 	for (const field of fields) {
-		const rawValue = getDeepValue(dataSource, field.key);
+		const rawValue = getDeepValue(field.key, dataSource);
 		const fallbackValue = field.datatype === 'array' ? [] : '';
 		if (field.lang && field.lang.length) {
 			obj[field.key] = {};
@@ -108,5 +108,6 @@ export function buildEditableObj(fields: any[], dataSource: any) {
 			}
 		}
 	}
+
 	return obj;
 }

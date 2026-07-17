@@ -21,19 +21,19 @@
 					{#each page.data.pageConfig.row as rowConf}
 						{#if rowConf.type === 'display'}
 							{#if rowConf.datatype === 'datetime'}
-								<td>{formatDateTime(getDeepValue(row, rowConf.key))}</td>
+								<td>{formatDateTime(getDeepValue(rowConf.key, row))}</td>
 							{:else if rowConf.datatype === 'boolean'}
 								<td>
 									<span
-										class={getDeepValue(row, rowConf.key)
+										class={getDeepValue(rowConf.key, row)
 											? 'badge text-white uppercase badge-success'
 											: 'badge text-white uppercase badge-error'}
 									>
-										{getDeepValue(row, rowConf.key)}
+										{getDeepValue(rowConf.key, row)}
 									</span>
 								</td>
 							{:else}
-								<td>{getDeepValue(row, rowConf.key)}</td>
+								<td>{getDeepValue(rowConf.key, row)}</td>
 							{/if}
 						{:else if rowConf.type === 'actions'}
 							<td>

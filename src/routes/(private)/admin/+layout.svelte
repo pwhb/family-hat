@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/state';
 	import Breadcrumbs from '$lib/components/admin/breadcrumbs.svelte';
 	import Search from '$lib/components/admin/search.svelte';
 	import Sidebar from '$lib/components/admin/sidebar.svelte';
@@ -27,7 +28,9 @@
 		<Toast />
 		<TabsManager />
 		<Breadcrumbs />
-		{@render children()}
+		{#key page.url.pathname}
+			{@render children()}
+		{/key}
 	</div>
 	<Sidebar />
 </div>

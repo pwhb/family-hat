@@ -191,10 +191,10 @@
 					<legend class="fieldset-legend">{field.name}</legend>
 					{#if field.datatype === 'datetime'}
 						<p>
-							{formatDateTime(getDeepValue(data, field.key))}
+							{formatDateTime(getDeepValue(field.key, data))}
 						</p>
 					{:else}
-						<p>{getDeepValue(data, field.key)}</p>
+						<p>{getDeepValue(field.key, data)}</p>
 					{/if}
 				</div>
 			{/each}

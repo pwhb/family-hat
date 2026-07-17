@@ -5,7 +5,7 @@ import { ObjectId, type Document } from 'mongodb';
 import { createLookUpSlice } from '$lib/server/common';
 import { decrypt } from '$lib/server/crypto';
 
-export const load: PageServerLoad = async ({ cookies, url, params }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const client = await clientPromise;
 	const colName = params.slug.replaceAll('-', '_');
 	const col = client.db(DB_NAME).collection(colName);

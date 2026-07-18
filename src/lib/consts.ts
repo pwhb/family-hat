@@ -33,5 +33,6 @@ export const ADMIN_TOKEN = 'admin_token';
 
 export const SERVER_ENDPOINTS = {
 	LOGIN: '/login',
-	MISSING_CONFIG_ERROR: '/error/missing-config'
+	MISSING_CONFIG_ERROR: '/error/missing-config',
+	FORBIDDEN_ERROR: '/error/forbidden'
 };

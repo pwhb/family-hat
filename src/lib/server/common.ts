@@ -5,7 +5,11 @@ import type { Cookies } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Document } from 'mongodb';
 
-export const SKIP_REDIRECT_ROUTES = [SERVER_ENDPOINTS.LOGIN, SERVER_ENDPOINTS.MISSING_CONFIG_ERROR];
+export const SKIP_REDIRECT_ROUTES = [
+	SERVER_ENDPOINTS.LOGIN,
+	SERVER_ENDPOINTS.MISSING_CONFIG_ERROR,
+	SERVER_ENDPOINTS.FORBIDDEN_ERROR
+];
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -56,11 +60,33 @@ export const checkAuth = async (request: Request, cookies: Cookies) => {
 export const getUserFromToken = async (token: string) => {
 	const payload: any = jwt.verify(token, SECRET_KEY);
 	const client = await clientPromise;
-	const user = await client
+	const userRes = await client
 		.db(DB_NAME)
 		.collection('users')
-		.findOne({ username: payload.username, isActive: true });
-	if (!user) return;
+		.aggregate([
+			{
+				$match: { username: payload.username, isActive: true }
+			},
+			...createLookUpSlice({
+				from: 'user_roles',
+				localField: 'roles',
+				foreignField: '_id',
+				as: 'roles',
+				opts: {
+					isArray: true,
+					preserveArray: true,
+					project: {
+						name: 1,
+						pages: 1,
+						menus: 1,
+						permissions: 1
+					}
+				}
+			})
+		])
+		.toArray();
+	if (!userRes || !userRes[0]) return;
+	const user = userRes[0];
 	delete user.hashedPassword;
 	return user;
 };
@@ -80,31 +106,56 @@ export function serializeDoc<T extends { _id: any }>(doc: T) {
 	};
 }
 
-export const createLookUpSlice = ({
-	from,
-	localField,
-	foreignField,
-	as,
-	opts
-}: {
+interface IOptions {
+	project?: any;
+	isString?: any;
+	isArray?: boolean;
+	preserveArray?: boolean;
+}
+
+interface ILookUpSlice {
 	from: string;
 	localField: string;
 	foreignField: string;
 	as: string;
-	opts?: any;
-}) => {
-	const conversionExpression =
-		opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` };
+	opts?: IOptions;
+}
+
+export const createLookUpSlice = ({ from, localField, foreignField, as, opts }: ILookUpSlice) => {
+	let conversionExpression: any;
+
+	if (opts && opts.isArray) {
+		conversionExpression = {
+			$map: {
+				input: `$${localField}`,
+				as: 'idItem',
+				in: opts.isString ? '$$idItem' : { $toObjectId: '$$idItem' }
+			}
+		};
+	} else {
+		conversionExpression =
+			opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` };
+	}
 
 	const safeSearchId = {
 		$cond: {
 			if: {
-				$and: [{ $not: [{ $not: [`$${localField}`] }] }, { $ne: [`$${localField}`, ''] }]
+				$and: [
+					{ $not: [{ $not: [`$${localField}`] }] },
+					{ $ne: [`$${localField}`, ''] },
+
+					...(opts && opts.isArray ? [{ $ne: [`$${localField}`, []] }] : [])
+				]
 			},
 			then: conversionExpression,
 			else: '$$REMOVE'
 		}
 	};
+
+	const matchCondition =
+		opts && opts.isArray
+			? { $in: [`$${foreignField}`, '$$searchId'] }
+			: { $eq: [`$${foreignField}`, '$$searchId'] };
 
 	const slice: Document[] = [
 		{
@@ -117,24 +168,26 @@ export const createLookUpSlice = ({
 					{
 						$match: {
 							$expr: {
-								$and: [
-									{ $ifNull: ['$$searchId', false] },
-									{ $eq: [`$${foreignField}`, '$$searchId'] }
-								]
+								$and: [{ $ifNull: ['$$searchId', false] }, matchCondition]
 							}
 						}
 					}
 				],
 				as
 			}
-		},
-		{
+		}
+	];
+
+	const shouldUnwind = !(opts && opts.isArray) || (opts && opts.isArray && !opts.preserveArray);
+
+	if (shouldUnwind) {
+		slice.push({
 			$unwind: {
 				path: `$${as}`,
 				preserveNullAndEmptyArrays: true
 			}
-		}
-	];
+		});
+	}
 
 	if (opts && opts.project) {
 		slice[0].$lookup.pipeline = [...slice[0].$lookup.pipeline, { $project: opts.project }];

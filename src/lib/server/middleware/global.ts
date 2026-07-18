@@ -19,13 +19,16 @@ export const globalGuard: Handle = async ({ event, resolve }) => {
 		...(identifier === 'admin' ? [getConfig('ADMIN_CONFIG')] : [])
 	]);
 	if (!pageConfig) {
+		console.log('missing-config', locals.pageUrl);
 		throw redirect(
 			307,
-			`/error/missing-config?from=${encodeURIComponent(`${url.pathname}${url.search}`)}`
+			`${SERVER_ENDPOINTS.MISSING_CONFIG_ERROR}?from=${encodeURIComponent(`${url.pathname}${url.search}`)}`
 		);
 	}
 	locals.config = config;
 	locals.pageConfig = pageConfig.configs;
+	locals.pageName = pageConfig.name;
+	locals.pageId = pageConfig._id.toString();
 	locals.isPublic = pageConfig.isPublic;
 	locals.adminConfig = adminConfig;
 

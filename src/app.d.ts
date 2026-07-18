@@ -11,6 +11,10 @@ declare global {
 			identifier: string;
 			pageUrl: string;
 			isPublic: boolean;
+			rbac: any;
+			menus: any[];
+			pageName?: string;
+			pageId?: string;
 		}
 		// interface PageData {}
 		// interface PageState {}

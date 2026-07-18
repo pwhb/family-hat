@@ -36,6 +36,6 @@
 		<button type="button" class="btn btn-outline btn-sm" onclick={() => window.history.back()}>
 			Go Back
 		</button>
-		<a href="/" class="btn btn-sm btn-primary">Return Home</a>
+		<a href="/" class="btn btn-sm btn-primary">Go Home</a>
 	{/snippet}
 </ErrorLayout>

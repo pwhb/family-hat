@@ -9,16 +9,6 @@
 		class="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:hidden is-drawer-open:w-64"
 	>
 		<ul class="menu w-full grow">
-			<li>
-				<a href="/admin/me" class="is-drawer-close:hidden">
-					<span class="is-drawer-close:hidden">Logged In As: {user.name}</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin" class="is-drawer-close:hidden">
-					<span class="is-drawer-close:hidden">Dashboard</span>
-				</a>
-			</li>
 			{#each adminConfig.sidebarMenus as menu}
 				<li>
 					<a href={menu.url} class="is-drawer-close:hidden">

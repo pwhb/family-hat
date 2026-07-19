@@ -6,7 +6,12 @@ import { ObjectId } from 'mongodb';
 
 export const authGuard: Handle = async ({ event, resolve }) => {
 	const { cookies, locals, url } = event;
-	if (locals.isPublic || ['error'].includes(locals.identifier)) return resolve(event);
+	if (
+		locals.isPublic ||
+		['error'].includes(locals.identifier) ||
+		url.pathname === SERVER_ENDPOINTS.LOGOUT
+	)
+		return resolve(event);
 	const token = cookies.get(ADMIN_TOKEN);
 	if (token) {
 		locals.user = await getUserFromToken(token);

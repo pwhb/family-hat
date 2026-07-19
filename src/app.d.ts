@@ -14,6 +14,7 @@ declare global {
 			menus: any[];
 			pageName?: string;
 			pageId?: string;
+			query?: any;
 		}
 		// interface PageData {}
 		// interface PageState {}

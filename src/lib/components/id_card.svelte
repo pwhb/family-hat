@@ -36,7 +36,7 @@
 			default:
 				return {
 					container:
-						'card relative w-42 h-56 overflow-hidden rounded-4xl rounded-tr-lg rounded-bl-lg border border-base-300 bg-base-100 shadow-xl',
+						'card relative w-42 h-58 overflow-hidden rounded-4xl rounded-tr-lg rounded-bl-lg border border-base-300 bg-base-100 shadow-xl',
 					name: 'card-title justify-center text-sm font-extrabold tracking-tight text-base-content',
 					title: 'text-xs font-semibold tracking-wide text-primary/80 uppercase'
 				};

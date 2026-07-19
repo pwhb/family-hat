@@ -2,7 +2,7 @@ import { DB_NAME } from '$env/static/private';
 import { createLookUpSlice } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { ObjectId, type Document } from 'mongodb';
+import { ObjectId, type Document, type Filter } from 'mongodb';
 import { decrypt, encrypt } from '$lib/server/crypto';
 import { delCache } from '$lib/server/redis';
 
@@ -14,9 +14,11 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
 		const col = client.db(DB_NAME).collection(colName);
+		const query: Filter<any> = locals.query;
 		const pipeline: Document[] = [
 			{
 				$match: {
+					...query,
 					_id: new ObjectId(params.id)
 				}
 			},
@@ -79,8 +81,12 @@ export const PATCH: RequestHandler = async ({ request, params, locals }) => {
 				body.value = await encrypt(body.value);
 			}
 		}
+		const query: Filter<any> = locals.query;
 		const data = await col.findOneAndUpdate(
-			{ _id: new ObjectId(params.id) },
+			{
+				...query,
+				_id: new ObjectId(params.id)
+			},
 			{
 				$set: {
 					...body,
@@ -105,9 +111,13 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
 		const col = client.db(DB_NAME).collection(colName);
+		const query: Filter<any> = locals.query;
 		// const data = await col.deleteOne({ _id: new ObjectId(params.id) });
 		const data = await col.findOneAndUpdate(
-			{ _id: new ObjectId(params.id) },
+			{
+				...query,
+				_id: new ObjectId(params.id)
+			},
 			{
 				$set: {
 					isActive: false,

@@ -7,7 +7,7 @@ import { hash } from 'bcrypt';
 import { encrypt } from '$lib/server/crypto';
 import { COL_LIST } from '$lib/consts';
 
-export const GET: RequestHandler = async ({ params, request, url, cookies, locals }) => {
+export const GET: RequestHandler = async ({ params, url, locals }) => {
 	try {
 		if (!params.slug) {
 			return json({ message: 'Not Found' }, { status: 404 });
@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ params, request, url, cookies, local
 		const col = client.db(DB_NAME).collection(colName);
 		const page = Number(url.searchParams.get('page'));
 		const size = Number(url.searchParams.get('size'));
-		const query: Filter<any> = {};
+		const query: Filter<any> = locals.query;
 		for (let [key, value] of url.searchParams) {
 			if (key === 'q') {
 				if (['families', 'members'].includes(colName)) {

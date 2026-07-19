@@ -3,7 +3,7 @@
 	import { formatDateTime, getDeepValue } from '$lib/client/common';
 </script>
 
-<div class="overflow-x-auto">
+<div class="mx-4 overflow-x-auto md:mx-10">
 	<table class="table">
 		<!-- head -->
 		<thead>
@@ -49,7 +49,7 @@
 		{/if}
 	</table>
 </div>
-<div class="my-4 flex items-center justify-around">
+<div class="my-10 flex items-center justify-around">
 	<!-- <p>Showing {page.data.pageData.data.length} out of {page.data.pageData.count}</p> -->
 	{#if page.data.pageData}
 		<div class="join">

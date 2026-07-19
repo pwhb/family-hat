@@ -7,17 +7,19 @@ import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { ADMIN_TOKEN, SERVER_ENDPOINTS } from '$lib/consts';
 
-export const load: PageServerLoad = async ({}) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const client = await clientPromise;
-	const COL_LIST = ['members', 'families', 'relation_types', 'relationships'];
+	const list = locals.pageConfig.load;
 	const pageData: any = {};
-	const promises = COL_LIST.map(async (colName) => {
-		const collection = client.db(DB_NAME).collection(colName);
-		const [total, count] = await Promise.all([
-			collection.countDocuments(),
-			collection.countDocuments({ isActive: true })
-		]);
-		pageData[colName] = { total, count };
+	const promises = list.map(async (v: any) => {
+		const collection = client.db(DB_NAME).collection(v.collection);
+		if (v.type === 'total_count') {
+			const [total, count] = await Promise.all([
+				collection.countDocuments({ ...v.query }),
+				collection.countDocuments({ ...v.query, isActive: true })
+			]);
+			pageData[v.key] = { total, count };
+		}
 	});
 	await Promise.all(promises);
 	return {

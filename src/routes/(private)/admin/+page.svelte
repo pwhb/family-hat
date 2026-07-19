@@ -12,9 +12,9 @@
 				/
 				{getDeepValue(block.total, page.data.pageData)}
 			</div>
-			<div class="stat-actions">
+			<!-- <div class="stat-actions">
 				<a class="btn p-4 btn-xs btn-neutral" href={block.url}>View {block.name}</a>
-			</div>
+			</div> -->
 		</div>
 	{/each}
 </div>

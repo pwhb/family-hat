@@ -26,7 +26,6 @@ export function buildTree(flatData: FlatNode[], config?: TreeConfig): TreeNode[]
 			const value = String(item.value || item._id);
 			map.set(value, { ...item, value, label: item.label || value, children: [] });
 		}
-
 		for (const item of flatData) {
 			const value = String(item.value || item._id);
 			const mappedNode = { ...map.get(value)!, isCheckbox: true };

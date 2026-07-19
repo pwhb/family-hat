@@ -1,32 +1,58 @@
 import { DB_NAME } from '$env/static/private';
-import { checkAuth } from '$lib/server/common';
+import { createLookUpSlice } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { ObjectId } from 'mongodb';
-import { encrypt } from '$lib/server/crypto';
+import { ObjectId, type Document } from 'mongodb';
+import { decrypt, encrypt } from '$lib/server/crypto';
 import { delCache } from '$lib/server/redis';
 
-export const GET: RequestHandler = async ({ request, params, cookies }) => {
+export const GET: RequestHandler = async ({ params, locals }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies);
-		if (!authenticated) {
-			return json({ message: 'Unauthorized' }, { status: 401 });
-		}
 		if (!params.slug) {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
 		const col = client.db(DB_NAME).collection(colName);
-		const data = await col.findOne(
-			{ _id: new ObjectId(params.id), isActive: true },
+		const pipeline: Document[] = [
 			{
-				projection: {
-					appId: 0,
-					isActive: 0
+				$match: {
+					_id: new ObjectId(params.id)
 				}
+			},
+			...createLookUpSlice({
+				from: 'users',
+				localField: 'createdBy',
+				foreignField: '_id',
+				as: 'createdByUser',
+				opts: {
+					project: { name: 1, username: 1 }
+				}
+			}),
+			...createLookUpSlice({
+				from: 'users',
+				localField: 'updatedBy',
+				foreignField: '_id',
+				as: 'updatedByUser',
+				opts: {
+					project: { name: 1, username: 1 }
+				}
+			}),
+			{
+				$project: {
+					appId: 0
+				}
+			},
+			{
+				$limit: 1
 			}
-		);
+		];
+
+		const list = await col.aggregate(pipeline).toArray();
+		const data = list[0];
+		if (colName === 'configs' && data.type === 'secured') {
+			data.value = await decrypt(data.value);
+		}
 		if (!data) {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
@@ -36,12 +62,8 @@ export const GET: RequestHandler = async ({ request, params, cookies }) => {
 	}
 };
 
-export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
+export const PATCH: RequestHandler = async ({ request, params, locals }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies);
-		if (!authenticated) {
-			return json({ message: 'Unauthorized' }, { status: 401 });
-		}
 		if (!params.slug) {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
@@ -63,7 +85,7 @@ export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 				$set: {
 					...body,
 					updatedAt: new Date(),
-					updatedBy: authenticated._id
+					updatedBy: locals.user._id
 				}
 			},
 			{ returnDocument: 'after' }
@@ -75,12 +97,8 @@ export const PATCH: RequestHandler = async ({ request, params, cookies }) => {
 	}
 };
 
-export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
+export const DELETE: RequestHandler = async ({ params, locals }) => {
 	try {
-		const authenticated = await checkAuth(request, cookies);
-		if (!authenticated) {
-			return json({ message: 'Unauthorized' }, { status: 401 });
-		}
 		if (!params.slug) {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
@@ -94,7 +112,7 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
 				$set: {
 					isActive: false,
 					updatedAt: new Date(),
-					updatedBy: authenticated._id
+					updatedBy: locals.user._id
 				}
 			},
 			{ returnDocument: 'after' }

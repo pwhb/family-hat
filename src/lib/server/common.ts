@@ -48,15 +48,6 @@ export const getToken = (request: Request, header = 'authorization') => {
 	return auth.split(' ')[1];
 };
 
-export const checkAuth = async (request: Request, cookies: Cookies) => {
-	let token = cookies.get(ADMIN_TOKEN);
-	if (!token && MODE === 'dev') {
-		token = getToken(request) as string;
-	}
-	if (!token) return;
-	return await getUserFromToken(token);
-};
-
 export const getUserFromToken = async (token: string) => {
 	const payload: any = jwt.verify(token, SECRET_KEY);
 	const client = await clientPromise;

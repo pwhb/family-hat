@@ -6,7 +6,6 @@ declare global {
 		interface Locals {
 			config: any;
 			pageConfig: any;
-			adminConfig: any;
 			user: any;
 			identifier: string;
 			pageUrl: string;

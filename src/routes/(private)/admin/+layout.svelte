@@ -29,8 +29,6 @@
 		<Breadcrumbs />
 
 		{#key page.url.pathname}
-			<!-- <p class="break-all">{JSON.stringify(page.data.user)}</p>
-			<p class="break-all">{JSON.stringify(page.data.menus)}</p> -->
 			{@render children()}
 		{/key}
 	</div>

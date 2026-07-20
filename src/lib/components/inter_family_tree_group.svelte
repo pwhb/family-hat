@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { lang } from '$lib/store/lang.svelte';
 	import InterFamilyTree from './inter_family_tree.svelte';
+	import { page } from '$app/state';
+	import { setActivePathContext } from '$lib/store/tree.svelte';
 
 	interface TreeProps {
 		families: any[];
@@ -13,7 +15,6 @@
 	let { families, relationships, focus, showTitle }: TreeProps = $props();
 	let scrollContainerRef: HTMLElement | null = $state(null);
 
-	// This reference map is sent downstream to collect target anchor points natively
 	let elRefs: Record<string, HTMLElement> = $state({});
 	let svgPaths: any[] = $state([]);
 	let hoveredPathIdx: number | null = $state(null);
@@ -22,6 +23,8 @@
 	let ticking = false;
 	let lastShuffleTime = 0;
 
+	let activePath = $derived(hoveredPathIdx !== null ? svgPaths[hoveredPathIdx] : null);
+	setActivePathContext(() => activePath);
 	function calculatePaths() {
 		if (!scrollContainerRef || !relationships) return;
 
@@ -66,7 +69,17 @@
 					pathData = `M ${x1} ${y1} V ${overlapY} H ${x2} V ${y2}`;
 				}
 
-				return { pathData, label: rel.sourceLabel[lang.value] };
+				return {
+					pathData,
+					label: rel.name,
+					sourceID: rel.sourceID,
+					targetID: rel.targetID,
+					sourceLabel: rel.sourceLabel,
+					targetLabel: rel.targetLabel,
+					category: rel.category,
+					title: page.data.config.titleMap[rel.category],
+					color: page.data.config.colorMap[rel.category]
+				};
 			})
 			.filter(Boolean);
 
@@ -122,7 +135,22 @@
 	class="relative h-screen w-screen overflow-auto p-12"
 	onscroll={requestPathUpdate}
 >
-	<!-- SVG Vector Line Rendering Plane Layer -->
+	{#if activePath}
+		<div
+			class="pointer-events-none fixed top-6 right-6 z-50 flex items-center gap-3 rounded-lg border border-base-300 bg-base-100/90 p-4 break-all shadow-xl backdrop-blur-md transition-all duration-200"
+			style="border-left: 6px solid {activePath.color}"
+		>
+			<div>
+				<p class="text-xs font-semibold tracking-wider text-base-content/60 uppercase">
+					{activePath.title[lang.value]}
+				</p>
+				<p class="text-sm font-bold text-base-content">
+					{activePath.label[lang.value]}
+				</p>
+			</div>
+		</div>
+	{/if}
+
 	<svg
 		class="pointer-events-none absolute top-0 left-0 transition-all duration-75 {isHoveringCard
 			? 'z-0 opacity-60'
@@ -134,7 +162,7 @@
 			<path
 				d={path.pathData}
 				fill="none"
-				stroke={hoveredPathIdx === idx ? '#28a745' : '#94a3b8'}
+				stroke={hoveredPathIdx === idx ? path.color : '#94a3b8'}
 				stroke-width={hoveredPathIdx === idx ? '5' : '2'}
 				stroke-linejoin="round"
 				class="transition-all duration-150 {hoveredPathIdx && hoveredPathIdx !== idx
@@ -161,7 +189,6 @@
 		{/each}
 	</svg>
 
-	<!-- Content Columns Box containing clean refactored Child elements -->
 	<div class="relative z-10 mx-auto flex min-h-max w-max flex-row items-stretch gap-4">
 		{#each families as item, idx}
 			<InterFamilyTree

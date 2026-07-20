@@ -77,12 +77,14 @@ export const load: PageServerLoad = async ({ params }) => {
 					code: 1,
 					sourceID: 1,
 					targetID: 1,
+					name: '$relationType.name',
 					sourceGender: '$relationType.sourceGender',
 					sourceLabel: '$relationType.sourceLabel',
 					sourceEnd: '$relationType.sourceEnd',
 					targetGender: '$relationType.targetGender',
 					targetLabel: '$relationType.targetLabel',
-					targetEnd: '$relationType.targetEnd'
+					targetEnd: '$relationType.targetEnd',
+					category: '$relationType.category'
 				}
 			}
 		])

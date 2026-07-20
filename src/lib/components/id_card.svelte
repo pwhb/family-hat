@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import type { LocalizedText } from '$lib/client/common';
 	import { lang } from '$lib/store/lang.svelte';
+	import { getActivePathContext } from '$lib/store/tree.svelte';
 
 	interface MemberProps {
 		_id: string;
@@ -24,6 +25,7 @@
 	}
 
 	let { member, family, type, focus }: MemberCardProps = $props();
+	const pathCtx = getActivePathContext();
 	const getCustomClass = () => {
 		switch (type) {
 			case 'full':
@@ -31,14 +33,16 @@
 					container:
 						'card relative w-80 overflow-hidden rounded-4xl rounded-tr-lg rounded-bl-lg border border-base-300 bg-base-100 shadow-xl',
 					name: 'card-title justify-center text-xl font-extrabold tracking-tight text-base-content',
-					title: 'text-sm font-semibold tracking-wide text-primary/80 uppercase'
+					title: 'text-sm font-semibold tracking-wide text-primary/80 uppercase',
+					onPath: `text-lg font-semibold tracking-wide uppercase underline decoration-6 underline-offset-8 ${pathCtx && pathCtx.activePath ? `decoration-${pathCtx.activePath.category.toLowerCase()}` : ''}`
 				};
 			default:
 				return {
 					container:
 						'card relative w-42 h-58 overflow-hidden rounded-4xl rounded-tr-lg rounded-bl-lg border border-base-300 bg-base-100 shadow-xl',
 					name: 'card-title justify-center text-sm font-extrabold tracking-tight text-base-content',
-					title: 'text-xs font-semibold tracking-wide text-primary/80 uppercase'
+					title: 'text-xs font-semibold tracking-wide text-primary/80 uppercase',
+					onPath: `text-md font-semibold tracking-wide uppercase underline decoration-6 underline-offset-8 ${pathCtx && pathCtx.activePath ? `decoration-${pathCtx.activePath.category.toLowerCase()}` : ''}`
 				};
 		}
 	};
@@ -84,9 +88,20 @@
 						<span class="text-lg" title="Family Center">👑</span>
 					{/if}
 				</h2>
-				<p class={getCustomClass().title}>
-					{member.title[lang.value]}
-				</p>
+
+				{#if pathCtx && pathCtx.activePath && pathCtx.activePath.sourceID === member._id}
+					<p class={getCustomClass().onPath}>
+						{pathCtx.activePath.sourceLabel[lang.value]}
+					</p>
+				{:else if pathCtx && pathCtx.activePath && pathCtx.activePath.targetID === member._id}
+					<p class={getCustomClass().onPath}>
+						{pathCtx.activePath.targetLabel[lang.value]}
+					</p>
+				{:else}
+					<p class={getCustomClass().title}>
+						{member.title[lang.value]}
+					</p>
+				{/if}
 			</div>
 
 			{#if type === 'full'}

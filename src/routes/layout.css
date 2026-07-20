@@ -18,3 +18,10 @@
 	font-family: 'Noto Serif Myanmar', serif;
 	font-style: normal;
 } */
+@theme {
+	--color-biological: #10b981;
+	--color-romantic: #f43f5e;
+	--color-professional: #3b82f6;
+	--color-platonic: #f59e0b;
+}
+@source inline('{text,decoration}-{biological,romantic,professional,platonic}');

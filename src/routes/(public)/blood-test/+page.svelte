@@ -3,4 +3,3 @@
 </script>
 
 <p>Coming Soon</p>
-<!-- <p>{JSON.stringify(page.data)}</p> -->

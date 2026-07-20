@@ -14,7 +14,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
 		const col = client.db(DB_NAME).collection(colName);
-		const query: Filter<any> = locals.query;
+		const query: Filter<any> = {
+			...locals.query,
+			appId: locals.user.appId
+		};
 		const pipeline: Document[] = [
 			{
 				$match: {
@@ -81,7 +84,10 @@ export const PATCH: RequestHandler = async ({ request, params, locals }) => {
 				body.value = await encrypt(body.value);
 			}
 		}
-		const query: Filter<any> = locals.query;
+		const query: Filter<any> = {
+			...locals.query,
+			appId: locals.user.appId
+		};
 		const data = await col.findOneAndUpdate(
 			{
 				...query,
@@ -111,7 +117,10 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
 		const col = client.db(DB_NAME).collection(colName);
-		const query: Filter<any> = locals.query;
+		const query: Filter<any> = {
+			...locals.query,
+			appId: locals.user.appId
+		};
 		// const data = await col.deleteOne({ _id: new ObjectId(params.id) });
 		const data = await col.findOneAndUpdate(
 			{

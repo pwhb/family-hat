@@ -147,6 +147,8 @@
 							<option value={option.value}>{option.label}</option>
 						{/each}
 					</select>
+				{:else}
+					<input class="input" value="Not allowed to change" disabled />
 				{/if}
 			{:else if field.inputtype === 'tree-selector'}
 				{#if optionsCache[field.key] && optionsCache[field.key].length}

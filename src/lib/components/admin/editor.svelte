@@ -158,7 +158,11 @@
 					/>
 				{/if}
 			{:else if field.inputtype === 'multi-select'}
-				<MultiSelect bind:selectedValues={obj[field.key]} options={optionsCache[field.key]} />
+				<MultiSelect
+					bind:selectedValues={obj[field.key]}
+					key={field.key}
+					options={optionsCache[field.key]}
+				/>
 			{:else if field.inputtype === 'upload'}
 				<Upload
 					bind:value={obj[field.key]}
@@ -202,5 +206,17 @@
 			{/each}
 		</div>
 	{/if}
-	<button type="submit" class="btn btn-primary">Save</button>
+	<div class="flex w-full gap-4">
+		<button
+			type="button"
+			class="btn flex-1 btn-neutral"
+			onclick={() => {
+				const formTab = tabManager.list.find((t) => t.pathname === page.url.pathname);
+				if (formTab) {
+					tabManager.closeTab(formTab.id);
+				}
+			}}>Cancel</button
+		>
+		<button type="submit" class="btn flex-1 btn-primary">Save</button>
+	</div>
 </form>

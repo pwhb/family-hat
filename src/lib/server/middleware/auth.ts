@@ -19,7 +19,10 @@ export const authGuard: Handle = async ({ event, resolve }) => {
 			cookies.delete(ADMIN_TOKEN, {
 				path: '/'
 			});
+		} else if (url.pathname === SERVER_ENDPOINTS.LOGIN) {
+			throw redirect(307, SERVER_ENDPOINTS.DASHBOARD);
 		}
+
 		if (locals.user.roles) {
 			const roles = locals.user.roles;
 			locals.rbac = {

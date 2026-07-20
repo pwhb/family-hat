@@ -4,6 +4,7 @@
 	import Seo from '$lib/components/seo.svelte';
 	import { page } from '$app/state';
 	import NavProgress from '$lib/components/nav_progress.svelte';
+	import Toast from '$lib/components/toast.svelte';
 	let { children } = $props();
 
 	$effect(() => {
@@ -16,4 +17,5 @@
 <Seo />
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 <NavProgress />
+<Toast />
 {@render children()}

@@ -1,11 +1,11 @@
-import { APP_ID, DB_NAME, MODE } from '$env/static/private';
+import { DB_NAME, MODE } from '$env/static/private';
 import { createLookUpSlice } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Document, type Filter } from 'mongodb';
-import { hash } from 'bcrypt';
 import { encrypt } from '$lib/server/crypto';
 import { COL_LIST } from '$lib/consts';
+import { hash } from 'argon2';
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	try {
@@ -89,6 +89,8 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 				} else {
 					query[key] = v;
 				}
+			} else if (!['page', 'size'].includes(key)) {
+				query[key] = value;
 			}
 		}
 
@@ -202,8 +204,9 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			// relation types
 			body.code = `${body.sourceLabel.en.replace(/\s/g, '_').toUpperCase()}_${body.targetLabel.en.replace(/\s/g, '_').toUpperCase()}`;
 		} else if (colName === 'users') {
-			body.hashedPassword = await hash(body.password, 10);
+			body.hashedPassword = await hash(body.password);
 			body.code = body.name.replace(/\s/g, '_').toUpperCase();
+			if (!body.username) body.username = body.code.toLowerCase();
 			delete body.password;
 		} else if (colName === 'configs' && body.type && body.type === 'secured') {
 			body.value = await encrypt(body.value);

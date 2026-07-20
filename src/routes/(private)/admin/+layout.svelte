@@ -4,7 +4,6 @@
 	import Search from '$lib/components/admin/search.svelte';
 	import Sidebar from '$lib/components/admin/sidebar.svelte';
 	import TabsManager from '$lib/components/admin/tabs_manager.svelte';
-	import Toast from '$lib/components/toast.svelte';
 	let { children } = $props();
 </script>
 
@@ -25,7 +24,7 @@
 			</div>
 		</nav>
 		<!-- Page content here -->
-		<Toast />
+
 		<TabsManager />
 		<Breadcrumbs />
 

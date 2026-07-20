@@ -30,9 +30,15 @@ export const COL_LIST = [
 ];
 
 export const ADMIN_TOKEN = 'admin_token';
-
+export const AUTH_STRATEGY = {
+	BASIC: 'basic_token',
+	BEARER: 'bearer_token'
+};
 export const SERVER_ENDPOINTS = {
 	LOGIN: '/login',
+	LOGIN_API: '/api/auth/login',
+	CHANGE_PASSWORD_API: '/api/auth/changePassword',
+	DASHBOARD: '/admin',
 	LOGOUT: '/admin?/logout',
 	MISSING_CONFIG_ERROR: '/error/missing-config',
 	FORBIDDEN_ERROR: '/error/forbidden'

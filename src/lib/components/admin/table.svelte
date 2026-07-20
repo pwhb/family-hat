@@ -1,9 +1,10 @@
 <script>
 	import { page } from '$app/state';
 	import { formatDateTime, getDeepValue } from '$lib/client/common';
+	import ActionDropdown from './action_dropdown.svelte';
 </script>
 
-<div class="mx-4 overflow-x-auto md:mx-10">
+<div class="mx-4 mb-10 overflow-x-auto md:mx-10">
 	<table class="table">
 		<!-- head -->
 		<thead>
@@ -38,8 +39,7 @@
 								{/if}
 							{:else if rowConf.type === 'actions'}
 								<td>
-									<a href={`${page.url.pathname}/edit/${row._id}`} class="btn btn-secondary">Edit</a
-									>
+									<ActionDropdown {row} />
 								</td>
 							{/if}
 						{/each}

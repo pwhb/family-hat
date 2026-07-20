@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/state';
 	import { formatDateTime } from '$lib/client/common';
+	import ChangePassword from '$lib/components/admin/change_password.svelte';
 	const { user, rbac } = page.data;
 </script>
 
@@ -83,7 +84,7 @@
 					</div>
 				</div>
 			</div>
-
+			<ChangePassword />
 			<div
 				class="mt-2 flex items-center justify-between border-t border-base-200/60 pt-4 text-[11px] font-medium tracking-wide text-base-content/40"
 			>

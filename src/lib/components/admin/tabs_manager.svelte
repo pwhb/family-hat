@@ -9,7 +9,6 @@
 	function handleClose(e: MouseEvent, id: string) {
 		e.preventDefault();
 		e.stopPropagation();
-
 		tabManager.closeTab(id);
 	}
 </script>

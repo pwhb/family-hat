@@ -8,11 +8,13 @@
 	let {
 		options = [],
 		selectedValues = $bindable([]),
-		placeholder = 'Add'
+		placeholder = 'Add',
+		key = ''
 	} = $props<{
 		options: Option[];
 		selectedValues: string[];
 		placeholder?: string;
+		key: string;
 	}>();
 
 	let searchQuery = $state('');
@@ -51,7 +53,7 @@
 <div class="dropdown" class:dropdown-open={isDropdownOpen && filteredOptions.length > 0}>
 	<div
 		class="input-bordered input flex h-auto min-h-12 cursor-text flex-wrap items-center gap-1.5 px-3 py-1.5"
-		onclick={() => document.getElementById('combo-input')?.focus()}
+		onclick={() => document.getElementById(`${key}-combo-input`)?.focus()}
 		role="presentation"
 	>
 		{#each selectedObjects as tag (tag.value)}
@@ -70,7 +72,7 @@
 			</div>
 		{/each}
 		<input
-			id="combo-input"
+			id={`${key}-combo-input`}
 			type="text"
 			bind:value={searchQuery}
 			{placeholder}

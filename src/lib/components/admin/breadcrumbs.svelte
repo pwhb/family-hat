@@ -23,14 +23,6 @@
 		}
 		return list;
 	};
-
-	const isListPage = (pathname: string) => {
-		const split = pathname.split('/');
-		if (split.length === 3 && split[2] !== 'me') {
-			return true;
-		}
-		return false;
-	};
 </script>
 
 <div class="mx-10 flex items-center justify-between">
@@ -42,8 +34,14 @@
 		</ul>
 	</div>
 	<div>
-		{#if isListPage(page.url.pathname)}
-			<a class="btn btn-sm btn-primary" href={`${page.url.pathname}/create`}>Create</a>
+		{#if page.data.pageConfig.actions && page.data.pageConfig.actions.header && page.data.pageConfig.actions.header.length}
+			{#each page.data.pageConfig.actions.header as action}
+				{#if action.requiredPermission.some((v: string) => page.data.rbac.permissions.includes(v))}
+					{#if action.url}
+						<a class="btn btn-sm btn-primary" href={action.url}>{action.label}</a>
+					{/if}
+				{/if}
+			{/each}
 		{/if}
 	</div>
 </div>

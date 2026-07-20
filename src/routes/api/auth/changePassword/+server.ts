@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 		const matched = await verify(user.hashedPassword, password);
 		if (!matched) {
-			return json({ message: "Invalid Credentials", }, { status: 400 })
+			return json({ message: 'Invalid Credentials' }, { status: 400 });
 		}
 		await col.findOneAndUpdate(
 			{ _id: locals.user._id },

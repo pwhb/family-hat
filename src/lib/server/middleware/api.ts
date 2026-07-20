@@ -38,10 +38,15 @@ function isIdAllowed(queryId: any, targetId: string): boolean {
 export const apiGuard: Handle = async ({ event, resolve }) => {
 	const { locals, request } = event;
 	if (locals.identifier !== 'api') return resolve(event);
-	console.log(locals.pageUrl);
-	if (locals.pageUrl === '/api/backdoor') return resolve(event);
-
-	const permissions = await Q.find('permissions', { url: locals.pageUrl, method: request.method });
+	const permissions = await Q.find(
+		'permissions',
+		{ url: locals.pageUrl, method: request.method },
+		{
+			sort: {
+				priorty: -1
+			}
+		}
+	);
 
 	if (permissions.some((v) => v.authStrategy === AUTH_STRATEGY.BASIC)) return resolve(event);
 

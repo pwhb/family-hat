@@ -6,6 +6,7 @@
 	interface UploadProps {
 		value?: string;
 		name?: string;
+		previewUrlKey?: string;
 		cropRequired?: boolean;
 		aspectRatio?: number;
 		accept?: string[];
@@ -13,14 +14,17 @@
 
 	let {
 		value = $bindable(''),
+		previewUrlKey = '',
 		name = 'upload',
 		cropRequired = false,
 		aspectRatio = 1,
 		accept = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 	}: UploadProps = $props();
 
-	// Svelte 5 States
 	let image = $state<string | null>(null);
+	let previewUrl = $state<string>(
+		(() => (previewUrlKey ? page.data?.pageData?.data?.[previewUrlKey] : ''))()
+	);
 	let crop = $state({ x: 0, y: 0 });
 	let zoom = $state(1);
 
@@ -30,7 +34,6 @@
 	let selectedFile = $state<File | null>(null);
 	let croppedPixels = $state<{ x: number; y: number; width: number; height: number } | null>(null);
 
-	// Reference element to reset the file input natively
 	let fileInputEl = $state<HTMLInputElement | null>(null);
 
 	const getCroppedImg = (
@@ -98,7 +101,6 @@
 			await handleUpload();
 		}
 
-		// The Fix: Clear out input element value so uploading the same file again fires onchange
 		if (fileInputEl) fileInputEl.value = '';
 	};
 
@@ -113,7 +115,11 @@
 				uploadPayload = await getCroppedImg(image, croppedPixels);
 			}
 
-			value = await api.upload(uploadPayload);
+			const res = await api.upload(uploadPayload);
+			if (res && res.key && res.previewUrl) {
+				value = res.key;
+				previewUrl = res.previewUrl;
+			}
 			resetWorkflow();
 		} catch (e) {
 			console.error('Upload lifecycle error:', e);
@@ -134,12 +140,13 @@
 
 	const removeImage = () => {
 		value = '';
+		previewUrl = '';
 		resetWorkflow();
 	};
 </script>
 
+<p>{previewUrlKey} {previewUrl}</p>
 <div class="flex w-full max-w-sm flex-col gap-4">
-	<!-- Hidden File Input -->
 	<input
 		type="file"
 		bind:this={fileInputEl}
@@ -150,7 +157,6 @@
 	/>
 
 	{#if uploading}
-		<!-- Loading State -->
 		<div
 			class="bg-base-50 flex w-64 flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 p-8"
 		>
@@ -158,7 +164,6 @@
 			<p class="text-sm text-base-content/70">Uploading ...</p>
 		</div>
 	{:else if showCropper && image}
-		<!-- Cropper State: Buttons are placed SAFELY below the interactive workspace -->
 		<div class="flex flex-col gap-3">
 			<div class="relative h-64 w-full overflow-hidden rounded-2xl bg-neutral shadow-inner">
 				<Cropper
@@ -183,18 +188,16 @@
 				</button>
 			</div>
 		</div>
-	{:else if value}
-		<!-- Saved State: Floating Actions overlaying the image preview on hover -->
+	{:else if value && previewUrl}
 		<div
 			class="group relative aspect-square w-64 overflow-hidden rounded-2xl border border-base-200 bg-base-100 p-1 shadow-md"
 		>
 			<img
-				src={`${page.data.config.s3BaseUrl}/${value}`}
+				src={previewUrl}
 				alt={name}
 				class="h-full w-full rounded-xl object-cover transition-all duration-200 group-hover:scale-105 group-hover:blur-[2px] group-hover:brightness-75"
 			/>
 
-			<!-- Floating overlay layout buttons inside group container -->
 			<div
 				class="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
 			>
@@ -215,7 +218,6 @@
 			</div>
 		</div>
 	{:else}
-		<!-- Placeholder Empty State -->
 		<div
 			class="flex h-64 w-64 flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/50 p-8 text-center"
 		>

@@ -10,6 +10,7 @@
 		title: LocalizedText;
 		gender?: string;
 		avatarUrl?: string;
+		previewUrl?: string;
 	}
 	interface FamilyProps {
 		name: LocalizedText;
@@ -56,14 +57,11 @@
 
 		<div class="card-body items-center pt-8 pb-6 text-center">
 			<div class="placeholder avatar mb-2">
-				{#if member.avatarUrl}
+				{#if member.previewUrl}
 					<div
 						class="h-24 w-24 rounded-3xl rounded-tl-sm rounded-br-sm bg-gray-200 text-neutral-content shadow-md"
 					>
-						<img
-							src={`${page.data.config.s3BaseUrl}/${member.avatarUrl}`}
-							alt={member.name[lang.value]}
-						/>
+						<img src={member.previewUrl} alt={member.name[lang.value]} />
 					</div>
 				{:else}
 					<div

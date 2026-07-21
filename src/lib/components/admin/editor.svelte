@@ -167,6 +167,7 @@
 				<Upload
 					bind:value={obj[field.key]}
 					name={field.name}
+					previewUrlKey={field.previewUrlKey}
 					cropRequired={field.cropRequired}
 					aspectRatio={field.aspectRatio}
 					accept={field.accept}

@@ -1,9 +1,10 @@
 import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
-import { createLookUpSlice } from '$lib/server/common';
+import { createLookUpSlice, mapDeep } from '$lib/server/common';
+import { mappers, type MapperKey } from '$lib/server/mappers';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const client = await clientPromise;
 	const membersCol = client.db(DB_NAME).collection('members');
 	const families = await membersCol
@@ -89,6 +90,14 @@ export const load: PageServerLoad = async ({ params }) => {
 			}
 		])
 		.toArray();
-
-	return { pageData: { families, relationships } };
+	let pageData = { families, relationships };
+	if (locals.pageConfig.privateConfigs && locals.pageConfig.privateConfigs.mapDeepConfigs) {
+		for (const { paths, func, key } of locals.pageConfig.privateConfigs.mapDeepConfigs) {
+			const mapper = mappers[func as MapperKey];
+			if (mapper) {
+				pageData = await mapDeep(pageData, paths, mapper, key);
+			}
+		}
+	}
+	return { pageData };
 };

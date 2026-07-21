@@ -35,7 +35,6 @@
 		return val;
 	}
 
-	// Helper to format incoming values safely to the editor content structure
 	function toEditorContent(val: any, isJsonMode: boolean): Content {
 		const nativeData = parseToNative(val);
 		if (isJsonMode) {
@@ -47,7 +46,6 @@
 		}
 	}
 
-	// Initialize editor state
 	let content: Content = $state(untrack(() => toEditorContent(value, json)));
 
 	$effect(() => {
@@ -72,7 +70,7 @@
 				try {
 					internalSig = JSON.stringify(JSON.parse(content.text));
 				} catch {
-					isInternalInvalid = true; // Text mode has structural syntax errors
+					isInternalInvalid = true;
 				}
 			}
 
@@ -92,7 +90,6 @@
 		}
 
 		try {
-			// 1. Extract the raw input out of whichever layout mode the user is typing in
 			let extracted: any;
 			if ('json' in updatedContent) {
 				extracted = updatedContent.json;
@@ -100,19 +97,14 @@
 				extracted = JSON.parse(updatedContent.text);
 			}
 
-			// 2. Enforce structural format mutations upstream based on requirements
 			if (json) {
-				// FORCE: Must be an object, never a string representation
 				const dynamicObject = parseToNative(extracted);
 				value = typeof dynamicObject === 'object' && dynamicObject !== null ? dynamicObject : {};
 			} else {
-				// FORCE: Strictly a flattened, minified JSON string layout
 				const dynamicObject = parseToNative(extracted);
 				value = JSON.stringify(dynamicObject);
 			}
-		} catch (e) {
-			// Absorb incomplete text parsing states during rapid typing strokes
-		}
+		} catch (e) {}
 	};
 </script>
 

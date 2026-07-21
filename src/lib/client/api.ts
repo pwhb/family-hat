@@ -18,7 +18,7 @@ export const api = {
 				body: file
 			});
 			if (uploadRes.ok) {
-				return resJSON.key;
+				return resJSON;
 			}
 		}
 	}

@@ -1,7 +1,6 @@
-import { DB_NAME, MODE, ROOT_TOKEN, SECRET_KEY } from '$env/static/private';
-import { ADMIN_TOKEN, SERVER_ENDPOINTS } from '$lib/consts';
+import { DB_NAME, ROOT_TOKEN, SECRET_KEY } from '$env/static/private';
+import { SERVER_ENDPOINTS } from '$lib/consts';
 import clientPromise from '$lib/db';
-import type { Cookies } from '@sveltejs/kit';
 import jwt from 'jsonwebtoken';
 import type { Document } from 'mongodb';
 
@@ -186,3 +185,73 @@ export const createLookUpSlice = ({ from, localField, foreignField, as, opts }: 
 
 	return slice;
 };
+
+export type AsyncMapper<T = any, R = any> = (value: T, key: string) => Promise<R> | R;
+
+/**
+ * Traverses a target structure using dot-notation path segments and applies
+ * a mapping function to the target leaf nodes (or creates a new sibling node).
+ */
+async function processPath(
+	data: any,
+	pathParts: string[],
+	mapper: AsyncMapper,
+	destinationKey?: string
+): Promise<any> {
+	if (data === null || data === undefined) return data;
+	if (pathParts.length === 0) {
+		return await mapper(data, '');
+	}
+	const [currentKey, ...remainingParts] = pathParts;
+	if (Array.isArray(data)) {
+		return await Promise.all(
+			data.map((item) => processPath(item, pathParts, mapper, destinationKey))
+		);
+	}
+
+	if (typeof data === 'object' && currentKey in data) {
+		if (remainingParts.length === 0) {
+			const sourceValue = data[currentKey];
+			const targetKey = destinationKey || currentKey;
+
+			const mappedValue = await mapper(sourceValue, currentKey);
+
+			return {
+				...data,
+				[targetKey]: mappedValue
+			};
+		}
+
+		return {
+			...data,
+			[currentKey]: await processPath(data[currentKey], remainingParts, mapper, destinationKey)
+		};
+	}
+
+	return data;
+}
+
+/**
+ * Executes a mapping function across one or more dot-notation path patterns.
+ *
+ * @param target The root object or array to transform
+ * @param paths Single string path or array of paths
+ * @param mapper Callback function applied to values matching the target paths
+ * @param destinationKey Optional target key name to write the result to.
+ */
+export async function mapDeep<T = any>(
+	target: T,
+	paths: string | string[],
+	mapper: AsyncMapper,
+	destinationKey?: string
+): Promise<T> {
+	const pathList = Array.isArray(paths) ? paths : [paths];
+	let result = target;
+
+	for (const pathStr of pathList) {
+		const pathParts = pathStr.split('.');
+		result = await processPath(result, pathParts, mapper, destinationKey);
+	}
+
+	return result;
+}

@@ -2,6 +2,8 @@ import { fillTemplate } from '$lib/client/common';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { SERVER_ENDPOINTS } from '$lib/consts';
+import { mappers, type MapperKey } from '$lib/server/mappers';
+import { mapDeep } from '$lib/server/common';
 
 export const load: PageServerLoad = async ({ params, fetch, locals, url }) => {
 	const apiConfig = locals.pageConfig.fetch;
@@ -10,7 +12,15 @@ export const load: PageServerLoad = async ({ params, fetch, locals, url }) => {
 		headers: apiConfig.headers
 	});
 	if (res.ok) {
-		const pageData = await res.json();
+		let pageData = await res.json();
+		if (locals.pageConfig.privateConfigs && locals.pageConfig.privateConfigs.mapDeepConfigs) {
+			for (const { paths, func, key } of locals.pageConfig.privateConfigs.mapDeepConfigs) {
+				const mapper = mappers[func as MapperKey];
+				if (mapper) {
+					pageData = await mapDeep(pageData, paths, mapper, key);
+				}
+			}
+		}
 		return { pageData };
 	}
 	if (res.status === 403) {

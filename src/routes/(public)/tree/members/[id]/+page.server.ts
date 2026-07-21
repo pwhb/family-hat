@@ -2,9 +2,10 @@ import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
 import { ObjectId } from 'mongodb';
-import { createLookUpSlice } from '$lib/server/common';
+import { createLookUpSlice, mapDeep } from '$lib/server/common';
+import { mappers, type MapperKey } from '$lib/server/mappers';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const client = await clientPromise;
 	const relationshipsCol = client.db(DB_NAME).collection('relationships');
 	const relationships = await relationshipsCol
@@ -98,5 +99,15 @@ export const load: PageServerLoad = async ({ params }) => {
 		])
 		.toArray();
 	const member = families[0].members.find((v: any) => v._id === params.id);
-	return { pageData: { families, relationships, member } };
+
+	let pageData = { families, relationships, member };
+	if (locals.pageConfig.privateConfigs && locals.pageConfig.privateConfigs.mapDeepConfigs) {
+		for (const { paths, func, key } of locals.pageConfig.privateConfigs.mapDeepConfigs) {
+			const mapper = mappers[func as MapperKey];
+			if (mapper) {
+				pageData = await mapDeep(pageData, paths, mapper, key);
+			}
+		}
+	}
+	return { pageData };
 };

@@ -12,9 +12,10 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 		if (locals.user && pathname === SERVER_ENDPOINTS.LOGIN) return redirect(302, '/admin');
 	}
 	const { user, rbac, menus, config, pageConfig } = locals;
+	const { privateConfigs, ...safePageConfig } = pageConfig ?? {};
 	return {
 		config,
-		pageConfig,
+		pageConfig: safePageConfig,
 		...(!!user && { user }),
 		...(!!rbac && { rbac }),
 		...(!!menus && { menus })

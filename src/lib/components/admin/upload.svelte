@@ -10,6 +10,7 @@
 		cropRequired?: boolean;
 		aspectRatio?: number;
 		accept?: string[];
+		callback?: (res: any) => any;
 	}
 
 	let {
@@ -18,7 +19,8 @@
 		name = 'upload',
 		cropRequired = false,
 		aspectRatio = 1,
-		accept = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+		accept = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+		callback
 	}: UploadProps = $props();
 
 	let image = $state<string | null>(null);
@@ -119,6 +121,9 @@
 			if (res && res.key && res.previewUrl) {
 				value = res.key;
 				previewUrl = res.previewUrl;
+				if (callback && typeof callback === 'function') {				
+					callback(res)
+				}
 			}
 			resetWorkflow();
 		} catch (e) {
@@ -145,7 +150,6 @@
 	};
 </script>
 
-<p>{previewUrlKey} {previewUrl}</p>
 <div class="flex w-full max-w-sm flex-col gap-4">
 	<input
 		type="file"
@@ -219,7 +223,7 @@
 		</div>
 	{:else}
 		<div
-			class="flex h-64 w-64 flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/50 p-8 text-center"
+			class="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/50 p-8 text-center"
 		>
 			<div class="mb-3 text-base-content/30">
 				<img src="/upload-minimalistic-svgrepo-com.svg" alt="upload" class="h-12 w-12 opacity-40" />

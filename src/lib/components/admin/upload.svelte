@@ -121,8 +121,8 @@
 			if (res && res.key && res.previewUrl) {
 				value = res.key;
 				previewUrl = res.previewUrl;
-				if (callback && typeof callback === 'function') {				
-					callback(res)
+				if (callback && typeof callback === 'function') {
+					callback(res);
 				}
 			}
 			resetWorkflow();

@@ -28,7 +28,7 @@
 
 		<TabsManager />
 		<Breadcrumbs />
-		<Toast/>
+		<Toast />
 
 		{#key page.url.pathname}
 			{@render children()}

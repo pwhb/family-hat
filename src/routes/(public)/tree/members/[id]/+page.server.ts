@@ -67,7 +67,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 						$push: {
 							_id: { $toString: '$_id' },
 							name: '$name',
-							title: '$title',
+							aliases: '$aliases',
 							code: '$code',
 							archetype: '$archetype',
 							level: '$level',

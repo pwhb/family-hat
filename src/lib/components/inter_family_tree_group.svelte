@@ -4,6 +4,7 @@
 	import InterFamilyTree from './inter_family_tree.svelte';
 	import { page } from '$app/state';
 	import { setActivePathContext } from '$lib/store/tree.svelte';
+	import { mergeDefaults } from '$lib/client/common';
 
 	interface TreeProps {
 		families: any[];
@@ -64,20 +65,35 @@
 				} else if (rel.sourceEnd === 'BOTTOM' && rel.targetEnd === 'BOTTOM') {
 					const dropPoint = Math.max(y1, y2) + OVERLAP_OFFSET;
 					pathData = `M ${x1} ${y1} V ${dropPoint} H ${x2} V ${y2}`;
+				} else if (rel.sourceEnd === 'SIDE' || rel.targetEnd === 'SIDE') {
+					const isSourceLeft = x1 < x2;
+					// 2. Attach to the right edge of left card, left edge of right card
+					const startX = isSourceLeft
+						? fromRect.right - containerRect.left + scrollX
+						: fromRect.left - containerRect.left + scrollX;
+					const endX = isSourceLeft
+						? toRect.left - containerRect.left + scrollX
+						: toRect.right - containerRect.left + scrollX;
+					// 3. Stagger the vertical entry points (Left = Shift Up 16px, Right = Shift Down 16px)
+					const OFFSET = 48;
+					const startY = fromRect.top + fromRect.height / 2 - containerRect.top + scrollY - OFFSET;
+					const endY = toRect.top + toRect.height / 2 - containerRect.top + scrollY + OFFSET;
+					// 4. Calculate horizontal midpoint between the two cards
+					const midX = startX + (endX - startX) / 2;
+					// 5. Orthogonal path: Right -> Down/Up to Step -> Right
+					pathData = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
 				} else {
 					const overlapY = y2 - OVERLAP_OFFSET;
 					pathData = `M ${x1} ${y1} V ${overlapY} H ${x2} V ${y2}`;
 				}
-
 				return {
 					pathData,
-					label: rel.name,
+					label: mergeDefaults(rel.name, rel.customName),
 					sourceID: rel.sourceID,
 					targetID: rel.targetID,
-					sourceLabel: rel.sourceLabel,
-					targetLabel: rel.targetLabel,
+					sourceLabel: mergeDefaults(rel.sourceLabel, rel.customSourceLabel),
+					targetLabel: mergeDefaults(rel.targetLabel, rel.customTargetLabel),
 					category: rel.category,
-					title: page.data.config.titleMap[rel.category],
 					color: page.data.config.colorMap[rel.category]
 				};
 			})
@@ -137,12 +153,14 @@
 >
 	{#if activePath}
 		<div
-			class="pointer-events-none fixed top-6 right-6 z-50 flex items-center gap-3 rounded-lg border border-base-300 bg-base-100/90 p-4 break-all shadow-xl backdrop-blur-md transition-all duration-200"
+			class={page.data.config.centerInfoBox
+				? 'pointer-events-none fixed top-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg border border-base-300 bg-base-100/90 p-4 break-all shadow-xl backdrop-blur-md transition-all duration-200'
+				: 'pointer-events-none fixed top-6 right-6 z-50 flex items-center gap-3 rounded-lg border border-base-300 bg-base-100/90 p-4 break-all shadow-xl backdrop-blur-md transition-all duration-200'}
 			style="border-left: 6px solid {activePath.color}"
 		>
 			<div>
 				<p class="text-xs font-semibold tracking-wider text-base-content/60 uppercase">
-					{activePath.title[lang.value]}
+					{page.data.config.titleMap[activePath.category][lang.value]}
 				</p>
 				<p class="text-sm font-bold text-base-content">
 					{activePath.label[lang.value]}

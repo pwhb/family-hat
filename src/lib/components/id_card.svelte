@@ -7,7 +7,9 @@
 	interface MemberProps {
 		_id: string;
 		name: LocalizedText;
-		title: LocalizedText;
+		aliases: {
+			[key: string]: LocalizedText;
+		};
 		gender?: string;
 		avatarUrl?: string;
 		previewUrl?: string;
@@ -35,7 +37,7 @@
 						'card relative w-80 overflow-hidden rounded-4xl rounded-tr-lg rounded-bl-lg border border-base-300 bg-base-100 shadow-xl',
 					name: 'card-title justify-center text-xl font-extrabold tracking-tight text-base-content',
 					title: 'text-sm font-semibold tracking-wide text-primary/80 uppercase',
-					onPath: `text-lg font-semibold tracking-wide uppercase underline decoration-6 underline-offset-8 ${pathCtx && pathCtx.activePath ? `decoration-${pathCtx.activePath.category.toLowerCase()}` : ''}`
+					onPath: `text-sm font-semibold tracking-wide uppercase underline decoration-6 underline-offset-8`
 				};
 			default:
 				return {
@@ -43,7 +45,7 @@
 						'card relative w-42 h-58 overflow-hidden rounded-4xl rounded-tr-lg rounded-bl-lg border border-base-300 bg-base-100 shadow-xl',
 					name: 'card-title justify-center text-sm font-extrabold tracking-tight text-base-content',
 					title: 'text-xs font-semibold tracking-wide text-primary/80 uppercase',
-					onPath: `text-md font-semibold tracking-wide uppercase underline decoration-6 underline-offset-8 ${pathCtx && pathCtx.activePath ? `decoration-${pathCtx.activePath.category.toLowerCase()}` : ''}`
+					onPath: `text-[0.625rem] font-bold tracking-wide uppercase`
 				};
 		}
 	};
@@ -88,17 +90,17 @@
 				</h2>
 
 				{#if pathCtx && pathCtx.activePath && pathCtx.activePath.sourceID === member._id}
-					<p class={getCustomClass().onPath}>
+					<p class={getCustomClass().onPath} style={`color: ${pathCtx.activePath.color};`}>
 						{pathCtx.activePath.sourceLabel[lang.value]}
 					</p>
 				{:else if pathCtx && pathCtx.activePath && pathCtx.activePath.targetID === member._id}
-					<p class={getCustomClass().onPath}>
+					<p class={getCustomClass().onPath} style={`color: ${pathCtx.activePath.color};`}>
 						{pathCtx.activePath.targetLabel[lang.value]}
 					</p>
-				{:else}
+					<!-- {:else}
 					<p class={getCustomClass().title}>
-						{member.title[lang.value]}
-					</p>
+						{member.aliases["primary"][lang.value]}
+					</p> -->
 				{/if}
 			</div>
 

@@ -13,6 +13,11 @@ export const formatDateTime = (str: string) => format(str, 'MMM d, yyyy HH:mm');
 
 export const getEntityName = (slug: string) => ENTITY_NAME_MAP[slug.replaceAll('-', '_')];
 
+export function mergeDefaults<T extends Record<string, any>>(first: T, second?: Partial<T>): T {
+	if (!second) return { ...first };
+
+	return Object.fromEntries(Object.keys(first).map((key) => [key, second[key] || first[key]])) as T;
+}
 export function isTemplateString(str: string): boolean {
 	if (!str) return false;
 	const templateRegex = /\{\{.*?\}\}/;

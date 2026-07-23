@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 						$push: {
 							_id: { $toString: '$_id' },
 							name: '$name',
-							title: '$title',
+							aliases: '$aliases',
 							code: '$code',
 							archetype: '$archetype',
 							level: '$level',
@@ -78,6 +78,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 					code: 1,
 					sourceID: 1,
 					targetID: 1,
+					customSourceLabel: 1,
+					customTargetLabel: 1,
+					customName: 1,
 					name: '$relationType.name',
 					sourceGender: '$relationType.sourceGender',
 					sourceLabel: '$relationType.sourceLabel',

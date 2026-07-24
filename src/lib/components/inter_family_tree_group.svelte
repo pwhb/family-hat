@@ -67,21 +67,44 @@
 					pathData = `M ${x1} ${y1} V ${dropPoint} H ${x2} V ${y2}`;
 				} else if (rel.sourceEnd === 'SIDE' || rel.targetEnd === 'SIDE') {
 					const isSourceLeft = x1 < x2;
-					// 2. Attach to the right edge of left card, left edge of right card
+
+					// Attach to the right edge of the left card, left edge of the right card
 					const startX = isSourceLeft
 						? fromRect.right - containerRect.left + scrollX
 						: fromRect.left - containerRect.left + scrollX;
 					const endX = isSourceLeft
 						? toRect.left - containerRect.left + scrollX
 						: toRect.right - containerRect.left + scrollX;
-					// 3. Stagger the vertical entry points (Left = Shift Up 16px, Right = Shift Down 16px)
+
 					const OFFSET = 48;
 					const startY = fromRect.top + fromRect.height / 2 - containerRect.top + scrollY - OFFSET;
 					const endY = toRect.top + toRect.height / 2 - containerRect.top + scrollY + OFFSET;
-					// 4. Calculate horizontal midpoint between the two cards
-					const midX = startX + (endX - startX) / 2;
-					// 5. Orthogonal path: Right -> Down/Up to Step -> Right
-					pathData = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
+
+					// Determine horizontal distance/span
+					const distanceX = Math.abs(endX - startX);
+
+					// Threshold to detect if there's an intervening card/family column
+					// (Adjust '320' to match your average card width + gap)
+					const ADJACENT_THRESHOLD = 320;
+					const GUTTER_SIZE = 16;
+
+					if (distanceX <= ADJACENT_THRESHOLD) {
+						// --- ADJACENT: Direct Step Between Cards ---
+						const midX = startX + (endX - startX) / 2;
+						pathData = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
+					} else {
+						// --- NON-ADJACENT: Detour Around Intermediate Cards ---
+						// 1. Gutters: Step 24px into the gap next to the cards before turning vertical
+						const gutterX1 = isSourceLeft ? startX + GUTTER_SIZE : startX - GUTTER_SIZE;
+						const gutterX2 = isSourceLeft ? endX - GUTTER_SIZE : endX + GUTTER_SIZE;
+
+						// 2. Detour Height: Route OVER top of cards (or UNDER if near top boundary)
+						const minY = Math.min(fromRect.top, toRect.top) - containerRect.top + scrollY;
+						const detourY = minY - OVERLAP_OFFSET; // Route 32px above the highest card
+
+						// 3. Orthogonal Detour: Start -> Gutter1 -> Up to Detour -> Across -> Down to Gutter2 -> End
+						pathData = `M ${startX} ${startY} H ${gutterX1} V ${detourY} H ${gutterX2} V ${endY} H ${endX}`;
+					}
 				} else {
 					const overlapY = y2 - OVERLAP_OFFSET;
 					pathData = `M ${x1} ${y1} V ${overlapY} H ${x2} V ${y2}`;

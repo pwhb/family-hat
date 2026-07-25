@@ -7,6 +7,7 @@ import { mappers, type MapperKey } from '$lib/server/mappers';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const client = await clientPromise;
+	const { privateConfigs } = locals.pageConfig;
 	const relationshipsCol = client.db(DB_NAME).collection('relationships');
 	const relationships = await relationshipsCol
 		.aggregate([
@@ -29,19 +30,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 				as: 'relationType'
 			}),
 			{
-				$project: {
-					code: 1,
-					sourceID: 1,
-					targetID: 1,
-					name: '$relationType.name',
-					sourceGender: '$relationType.sourceGender',
-					sourceLabel: '$relationType.sourceLabel',
-					sourceEnd: '$relationType.sourceEnd',
-					targetGender: '$relationType.targetGender',
-					targetLabel: '$relationType.targetLabel',
-					targetEnd: '$relationType.targetEnd',
-					category: '$relationType.category'
-				}
+				$project: privateConfigs.query.relationships.project
 			}
 		])
 		.toArray();
@@ -66,43 +55,27 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 					members: {
 						$push: {
 							_id: { $toString: '$_id' },
-							name: '$name',
-							aliases: '$aliases',
-							code: '$code',
-							archetype: '$archetype',
-							level: '$level',
-							order: '$order',
-							related: '$related',
-							avatarUrl: '$avatarUrl',
-							gender: '$gender'
+							...privateConfigs.query.members.project
 						}
 					}
 				}
 			},
-
 			...createLookUpSlice({
 				from: 'families',
 				localField: '_id',
 				foreignField: '_id',
-				as: 'family'
-			}),
-			{
-				$project: {
-					members: 1,
-					'family.name': 1,
-					'family.code': 1,
-					'family.fullName': 1,
-					'family.center': 1,
-					'family.customCss': 1
+				as: 'family',
+				opts: {
+					project: privateConfigs.query.families.project
 				}
-			}
+			})
 		])
 		.toArray();
 	const member = families[0].members.find((v: any) => v._id === params.id);
 
 	let pageData = { families, relationships, member };
-	if (locals.pageConfig.privateConfigs && locals.pageConfig.privateConfigs.mapDeepConfigs) {
-		for (const { paths, func, key } of locals.pageConfig.privateConfigs.mapDeepConfigs) {
+	if (privateConfigs && privateConfigs.mapDeepConfigs) {
+		for (const { paths, func, key } of privateConfigs.mapDeepConfigs) {
 			const mapper = mappers[func as MapperKey];
 			if (mapper) {
 				pageData = await mapDeep(pageData, paths, mapper, key);

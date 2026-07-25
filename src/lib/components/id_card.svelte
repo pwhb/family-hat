@@ -80,6 +80,9 @@
 			</div>
 
 			<div class="space-y-1">
+				{#if type === 'full'}
+					<span class={getCustomClass().title}>{member.aliases.title[lang.value]}</span>
+				{/if}
 				<h2
 					class={`${focus && focus === member._id ? 'text-accent underline' : ''} ${getCustomClass().name}`}
 				>
@@ -97,10 +100,6 @@
 					<p class={getCustomClass().onPath} style={`color: ${pathCtx.activePath.color};`}>
 						{pathCtx.activePath.targetLabel[lang.value]}
 					</p>
-					<!-- {:else}
-					<p class={getCustomClass().title}>
-						{member.aliases["primary"][lang.value]}
-					</p> -->
 				{/if}
 			</div>
 
@@ -108,6 +107,14 @@
 				<div class="divider my-1 opacity-60"></div>
 
 				<div class="flex w-full items-center justify-between px-2 text-left">
+					<div>
+						<span class="block text-[10px] font-bold tracking-widest uppercase opacity-40"
+							>House</span
+						>
+						<span class="text-sm font-bold text-base-content/90">{family.fullName[lang.value]}</span
+						>
+					</div>
+
 					<div>
 						<span class="block text-[10px] font-bold tracking-widest uppercase opacity-40"
 							>House</span

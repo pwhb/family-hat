@@ -5,6 +5,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { ObjectId, type Document, type Filter } from 'mongodb';
 import { decrypt, encrypt } from '$lib/server/crypto';
 import { delCache } from '$lib/server/redis';
+import { getDocumentDiff } from '$lib/server/diff';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	try {
@@ -88,6 +89,7 @@ export const PATCH: RequestHandler = async ({ request, params, locals }) => {
 			...locals.query,
 			appId: locals.user.appId
 		};
+
 		const data = await col.findOneAndUpdate(
 			{
 				...query,
@@ -99,9 +101,19 @@ export const PATCH: RequestHandler = async ({ request, params, locals }) => {
 					updatedAt: new Date(),
 					updatedBy: locals.user._id
 				}
-			},
-			{ returnDocument: 'after' }
+			}
 		);
+
+		const diff = getDocumentDiff(data, body);
+
+		await client.db(DB_NAME).collection(`history_${colName}`).insertOne({
+			refId: data?._id,
+			original: data,
+			update: body,
+			diff,
+			createdAt: new Date(),
+			createdBy: locals.user._id
+		});
 
 		return json({ data });
 	} catch (error) {

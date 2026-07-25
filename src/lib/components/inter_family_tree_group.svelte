@@ -24,8 +24,28 @@
 	let ticking = false;
 	let lastShuffleTime = 0;
 
+	const PATH_CONFIG = page.data.config.pathConfig || {
+		offsets: {
+			ROMANTIC: 24,
+			BIOLOGICAL: 36,
+			PLATONIC: 48,
+			PROFESSIONAL: 60
+		},
+		platonic: {
+			sideOffset: 48,
+			adjacentThreshold: 320,
+			gutterSize: 16
+		},
+		defaultOffset: 32
+	};
+
 	let activePath = $derived(hoveredPathIdx !== null ? svgPaths[hoveredPathIdx] : null);
 	setActivePathContext(() => activePath);
+
+	function getOffsetForCategory(category: string): number {
+		return (PATH_CONFIG.offsets as Record<string, number>)[category] ?? PATH_CONFIG.defaultOffset;
+	}
+
 	function calculatePaths() {
 		if (!scrollContainerRef || !relationships) return;
 
@@ -56,19 +76,18 @@
 				const y2 =
 					(rel.targetEnd === 'TOP' ? toRect.top : toRect.bottom) - containerRect.top + scrollY;
 
-				const OVERLAP_OFFSET = 32;
+				const categoryOffset = getOffsetForCategory(rel.category);
 				let pathData = '';
 
 				if (rel.sourceEnd === 'TOP' && rel.targetEnd === 'TOP') {
-					const risePoint = Math.min(y1, y2) - OVERLAP_OFFSET;
+					const risePoint = Math.min(y1, y2) - categoryOffset;
 					pathData = `M ${x1} ${y1} V ${risePoint} H ${x2} V ${y2}`;
 				} else if (rel.sourceEnd === 'BOTTOM' && rel.targetEnd === 'BOTTOM') {
-					const dropPoint = Math.max(y1, y2) + OVERLAP_OFFSET;
+					const dropPoint = Math.max(y1, y2) + categoryOffset;
 					pathData = `M ${x1} ${y1} V ${dropPoint} H ${x2} V ${y2}`;
 				} else if (rel.sourceEnd === 'SIDE' || rel.targetEnd === 'SIDE') {
 					const isSourceLeft = x1 < x2;
 
-					// Attach to the right edge of the left card, left edge of the right card
 					const startX = isSourceLeft
 						? fromRect.right - containerRect.left + scrollX
 						: fromRect.left - containerRect.left + scrollX;
@@ -76,39 +95,42 @@
 						? toRect.left - containerRect.left + scrollX
 						: toRect.right - containerRect.left + scrollX;
 
-					const OFFSET = 48;
-					const startY = fromRect.top + fromRect.height / 2 - containerRect.top + scrollY - OFFSET;
-					const endY = toRect.top + toRect.height / 2 - containerRect.top + scrollY + OFFSET;
+					const startY =
+						fromRect.top +
+						fromRect.height / 2 -
+						containerRect.top +
+						scrollY -
+						PATH_CONFIG.platonic.sideOffset;
+					const endY =
+						toRect.top +
+						toRect.height / 2 -
+						containerRect.top +
+						scrollY +
+						PATH_CONFIG.platonic.sideOffset;
 
-					// Determine horizontal distance/span
 					const distanceX = Math.abs(endX - startX);
 
-					// Threshold to detect if there's an intervening card/family column
-					// (Adjust '320' to match your average card width + gap)
-					const ADJACENT_THRESHOLD = 320;
-					const GUTTER_SIZE = 16;
-
-					if (distanceX <= ADJACENT_THRESHOLD) {
-						// --- ADJACENT: Direct Step Between Cards ---
+					if (distanceX <= PATH_CONFIG.platonic.adjacentThreshold) {
 						const midX = startX + (endX - startX) / 2;
 						pathData = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
 					} else {
-						// --- NON-ADJACENT: Detour Around Intermediate Cards ---
-						// 1. Gutters: Step 24px into the gap next to the cards before turning vertical
-						const gutterX1 = isSourceLeft ? startX + GUTTER_SIZE : startX - GUTTER_SIZE;
-						const gutterX2 = isSourceLeft ? endX - GUTTER_SIZE : endX + GUTTER_SIZE;
+						const gutterX1 = isSourceLeft
+							? startX + PATH_CONFIG.platonic.gutterSize
+							: startX - PATH_CONFIG.platonic.gutterSize;
+						const gutterX2 = isSourceLeft
+							? endX - PATH_CONFIG.platonic.gutterSize
+							: endX + PATH_CONFIG.platonic.gutterSize;
 
-						// 2. Detour Height: Route OVER top of cards (or UNDER if near top boundary)
 						const minY = Math.min(fromRect.top, toRect.top) - containerRect.top + scrollY;
-						const detourY = minY - OVERLAP_OFFSET; // Route 32px above the highest card
+						const detourY = minY - categoryOffset;
 
-						// 3. Orthogonal Detour: Start -> Gutter1 -> Up to Detour -> Across -> Down to Gutter2 -> End
 						pathData = `M ${startX} ${startY} H ${gutterX1} V ${detourY} H ${gutterX2} V ${endY} H ${endX}`;
 					}
 				} else {
-					const overlapY = y2 - OVERLAP_OFFSET;
+					const overlapY = y2 - categoryOffset;
 					pathData = `M ${x1} ${y1} V ${overlapY} H ${x2} V ${y2}`;
 				}
+
 				return {
 					pathData,
 					label: mergeDefaults(rel.name, rel.customName),

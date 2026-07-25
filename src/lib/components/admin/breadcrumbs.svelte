@@ -33,12 +33,16 @@
 			{/each}
 		</ul>
 	</div>
-	<div>
+	<div class="flex gap-2">
 		{#if page.data.pageConfig.actions && page.data.pageConfig.actions.header && page.data.pageConfig.actions.header.length}
 			{#each page.data.pageConfig.actions.header as action}
 				{#if action.requiredPermission.some((v: string) => page.data.rbac.permissions.includes(v))}
 					{#if action.url}
-						<a class="btn btn-sm btn-primary" href={action.url}>{action.label}</a>
+						{#if action.key === 'create'}
+							<a class="btn btn-sm btn-primary" href={action.url}>{action.label}</a>
+						{:else}
+							<a class="btn btn-sm btn-neutral" href={action.url}>{action.label}</a>
+						{/if}
 					{/if}
 				{/if}
 			{/each}

@@ -2,7 +2,7 @@ import { DB_NAME, ROOT_TOKEN, SECRET_KEY } from '$env/static/private';
 import { SERVER_ENDPOINTS } from '$lib/consts';
 import clientPromise from '$lib/db';
 import jwt from 'jsonwebtoken';
-import type { Document } from 'mongodb';
+import { createLookUpSlice } from './db';
 
 export const SKIP_REDIRECT_ROUTES = [
 	SERVER_ENDPOINTS.LOGIN,
@@ -95,96 +95,6 @@ export function serializeDoc<T extends { _id: any }>(doc: T) {
 		_id: doc._id.toString()
 	};
 }
-
-interface IOptions {
-	project?: any;
-	isString?: any;
-	isArray?: boolean;
-	preserveArray?: boolean;
-}
-
-interface ILookUpSlice {
-	from: string;
-	localField: string;
-	foreignField: string;
-	as: string;
-	opts?: IOptions;
-}
-
-export const createLookUpSlice = ({ from, localField, foreignField, as, opts }: ILookUpSlice) => {
-	let conversionExpression: any;
-
-	if (opts && opts.isArray) {
-		conversionExpression = {
-			$map: {
-				input: `$${localField}`,
-				as: 'idItem',
-				in: opts.isString ? '$$idItem' : { $toObjectId: '$$idItem' }
-			}
-		};
-	} else {
-		conversionExpression =
-			opts && opts.isString ? `$${localField}` : { $toObjectId: `$${localField}` };
-	}
-
-	const safeSearchId = {
-		$cond: {
-			if: {
-				$and: [
-					{ $not: [{ $not: [`$${localField}`] }] },
-					{ $ne: [`$${localField}`, ''] },
-
-					...(opts && opts.isArray ? [{ $ne: [`$${localField}`, []] }] : [])
-				]
-			},
-			then: conversionExpression,
-			else: '$$REMOVE'
-		}
-	};
-
-	const matchCondition =
-		opts && opts.isArray
-			? { $in: [`$${foreignField}`, '$$searchId'] }
-			: { $eq: [`$${foreignField}`, '$$searchId'] };
-
-	const slice: Document[] = [
-		{
-			$lookup: {
-				from,
-				let: {
-					searchId: safeSearchId
-				},
-				pipeline: [
-					{
-						$match: {
-							$expr: {
-								$and: [{ $ifNull: ['$$searchId', false] }, matchCondition]
-							}
-						}
-					}
-				],
-				as
-			}
-		}
-	];
-
-	const shouldUnwind = !(opts && opts.isArray) || (opts && opts.isArray && !opts.preserveArray);
-
-	if (shouldUnwind) {
-		slice.push({
-			$unwind: {
-				path: `$${as}`,
-				preserveNullAndEmptyArrays: true
-			}
-		});
-	}
-
-	if (opts && opts.project) {
-		slice[0].$lookup.pipeline = [...slice[0].$lookup.pipeline, { $project: opts.project }];
-	}
-
-	return slice;
-};
 
 export type AsyncMapper<T = any, R = any> = (value: T, key: string) => Promise<R> | R;
 

@@ -1,26 +1,6 @@
-import { DB_NAME } from '$env/static/private';
-import type { Abortable, Filter, FindOneOptions, FindOptions } from 'mongodb';
-import clientPromise from '../db';
 import { decrypt } from './crypto';
+import { Q } from './db';
 import { getCache, setCache } from './redis';
-
-export const Q = {
-	findOne: async (
-		collection: string,
-		query: Filter<any>,
-		options?: Omit<FindOneOptions, 'timeoutMode'> & Abortable
-	) => {
-		const client = await clientPromise;
-		const col = client.db(DB_NAME).collection(collection);
-		return await col.findOne(query, options);
-	},
-
-	find: async (collection: string, query: Filter<any>, options?: FindOptions & Abortable) => {
-		const client = await clientPromise;
-		const col = client.db(DB_NAME).collection(collection);
-		return await col.find(query, options).toArray();
-	}
-};
 
 export const getPageConfig = async (url: string) => await Q.findOne('pages', { url });
 
@@ -29,9 +9,7 @@ interface IConfig {
 	value: string;
 }
 const getConfigFromDB = async (key: string) => {
-	const client = await clientPromise;
-	const col = client.db(DB_NAME).collection('configs');
-	const data = await col.findOne({ key });
+	const data = await Q.findOne('configs', { key });
 	return {
 		type: data?.type,
 		value: data?.value

@@ -1,8 +1,9 @@
 import type { PageServerLoad } from './$types';
 import clientPromise from '$lib/db';
 import { DB_NAME } from '$env/static/private';
-import { createLookUpSlice, mapDeep } from '$lib/server/common';
+import { mapDeep } from '$lib/server/common';
 import { mappers, type MapperKey } from '$lib/server/mappers';
+import { createLookUpSlice } from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const client = await clientPromise;

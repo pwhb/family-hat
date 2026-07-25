@@ -1,8 +1,8 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { getUserFromToken } from '../common';
 import { ADMIN_TOKEN, SERVER_ENDPOINTS } from '$lib/consts';
-import { Q } from '../configs';
 import { ObjectId } from 'mongodb';
+import { Q } from '../db';
 
 export const authGuard: Handle = async ({ event, resolve }) => {
 	const { cookies, locals, url } = event;

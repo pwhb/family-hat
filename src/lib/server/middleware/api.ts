@@ -1,8 +1,8 @@
 import { json, type Handle } from '@sveltejs/kit';
-import { Q } from '../configs';
 import { fillTemplate } from '$lib/client/common';
 import { ObjectId } from 'mongodb';
 import { AUTH_STRATEGY } from '$lib/consts';
+import { Q } from '../db';
 const OID_REGEX = /^(?:ObjectId|\$oid)\(["']?([a-fA-F0-9]{24})["']?\)$/i;
 
 function parseQueryTemplate(template: string, source: Record<string, any>): Record<string, any> {
@@ -43,7 +43,7 @@ export const apiGuard: Handle = async ({ event, resolve }) => {
 		{ url: locals.pageUrl, method: request.method },
 		{
 			sort: {
-				priorty: -1
+				priorty: 1
 			}
 		}
 	);
@@ -56,16 +56,14 @@ export const apiGuard: Handle = async ({ event, resolve }) => {
 	if (!matched.length) {
 		return json({ message: 'Forbidden' }, { status: 403 });
 	}
-	const scopeMap: any = {};
-	matched.forEach((v) => {
-		scopeMap[v.scope] = v;
-	});
 	locals.query = {};
-	if (scopeMap['all']) return resolve(event);
-	if (scopeMap['group']) {
-		const perm = scopeMap['group'];
+	const perm = matched[0];
+	locals.apiConfig = perm.configs;
+	if (perm.scope === 'all') return resolve(event);
+	if (perm.scope === 'group') {
 		try {
-			const query = parseQueryTemplate(perm.customQuery, { ...locals.user.configs });
+			const customQuery = JSON.stringify(perm.configs.customQuery);
+			const query = parseQueryTemplate(customQuery, { ...locals.user.configs });
 			locals.query = { ...locals.query, ...query };
 		} catch (e) {
 			return json({ message: 'Invalid Config' }, { status: 500 });

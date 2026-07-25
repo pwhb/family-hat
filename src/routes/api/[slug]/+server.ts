@@ -1,11 +1,12 @@
 import { DB_NAME, MODE } from '$env/static/private';
-import { createLookUpSlice } from '$lib/server/common';
+
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { MongoServerError, type Document, type Filter } from 'mongodb';
 import { encrypt } from '$lib/server/crypto';
 import { COL_LIST } from '$lib/consts';
 import { hash } from 'argon2';
+import { createLookUpSlice } from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	try {
@@ -14,6 +15,9 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		}
 		const client = await clientPromise;
 		const colName = params.slug.replaceAll('-', '_');
+		if (!COL_LIST.includes(colName)) {
+			return json({ message: 'Not Found' }, { status: 404 });
+		}
 		const col = client.db(DB_NAME).collection(colName);
 		const page = Number(url.searchParams.get('page'));
 		const size = Number(url.searchParams.get('size'));

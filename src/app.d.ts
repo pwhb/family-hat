@@ -15,6 +15,7 @@ declare global {
 			pageName?: string;
 			pageId?: string;
 			query?: any;
+			apiConfig?: any;
 		}
 		// interface PageData {}
 		// interface PageState {}

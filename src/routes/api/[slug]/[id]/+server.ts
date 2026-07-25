@@ -1,11 +1,11 @@
 import { DB_NAME } from '$env/static/private';
-import { createLookUpSlice } from '$lib/server/common';
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { ObjectId, type Document, type Filter } from 'mongodb';
 import { decrypt, encrypt } from '$lib/server/crypto';
 import { delCache } from '$lib/server/redis';
 import { getDocumentDiff } from '$lib/server/diff';
+import { createLookUpSlice } from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
 	try {

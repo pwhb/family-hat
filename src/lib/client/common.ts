@@ -18,6 +18,24 @@ export function mergeDefaults<T extends Record<string, any>>(first: T, second?: 
 
 	return Object.fromEntries(Object.keys(first).map((key) => [key, second[key] || first[key]])) as T;
 }
+
+export function buildMappedData(
+	data: any[],
+	mapping: Record<string, string>
+): Record<string, any>[] {
+	const entries = Object.entries(mapping);
+	return data.map((item) => {
+		const row: Record<string, any> = {};
+		for (let i = 0; i < entries.length; i++) {
+			const [targetKey, sourcePath] = entries[i];
+			row[targetKey] = isTemplateString(sourcePath)
+				? fillTemplate(sourcePath, item)
+				: getDeepValue(sourcePath, item);
+		}
+		return row;
+	});
+}
+
 export function isTemplateString(str: string): boolean {
 	if (!str) return false;
 	const templateRegex = /\{\{.*?\}\}/;
@@ -64,16 +82,7 @@ export const getOptions = async ({
 			const { data } = await res.json();
 			if (!Array.isArray(data)) return [];
 
-			return data.map((item) =>
-				Object.fromEntries(
-					Object.entries(mapping).map(([targetKey, sourcePath]) => [
-						targetKey,
-						isTemplateString(sourcePath)
-							? fillTemplate(sourcePath, item)
-							: getDeepValue(sourcePath, item)
-					])
-				)
-			);
+			return buildMappedData(data, mapping);
 		} catch (err) {
 			console.error('Failed to resolve dynamic options:', err);
 			return [];

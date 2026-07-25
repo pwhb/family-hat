@@ -6,7 +6,7 @@ import { MongoServerError, type Document, type Filter } from 'mongodb';
 import { encrypt } from '$lib/server/crypto';
 import { COL_LIST } from '$lib/consts';
 import { hash } from 'argon2';
-import { createLookUpSlice } from '$lib/server/db';
+import { createLookUpSlice, getPipeline } from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	try {
@@ -98,77 +98,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 			}
 		}
 
-		const pipeline: Document[] = [
-			{
-				$match: query
-			},
-			{
-				$project: {
-					appId: 0,
-					hashedPassword: 0
-				}
-			},
-			{
-				$sort: {
-					_id: -1
-				}
-			},
-			{
-				$skip: (page - 1) * size
-			},
-			{
-				$limit: size
-			}
-		];
-
-		if (colName === 'members') {
-			const lookupSlice = createLookUpSlice({
-				from: 'families',
-				localField: 'familyID',
-				foreignField: '_id',
-				as: 'family'
-			});
-			const matchIndex = pipeline.findIndex((stage) => '$match' in stage);
-			if (matchIndex !== -1) {
-				pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
-			}
-		} else if (colName === 'menus') {
-			const lookupSlice = createLookUpSlice({
-				from: 'menus',
-				localField: 'parentID',
-				foreignField: '_id',
-				as: 'parent'
-			});
-			const matchIndex = pipeline.findIndex((stage) => '$match' in stage);
-			if (matchIndex !== -1) {
-				pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
-			}
-		} else if (colName === 'relationships') {
-			const lookupSlice = [
-				...createLookUpSlice({
-					from: 'members',
-					localField: 'sourceID',
-					foreignField: '_id',
-					as: 'sourceMember'
-				}),
-				...createLookUpSlice({
-					from: 'members',
-					localField: 'targetID',
-					foreignField: '_id',
-					as: 'targetMember'
-				}),
-				...createLookUpSlice({
-					from: 'relation_types',
-					localField: 'relationTypeID',
-					foreignField: '_id',
-					as: 'relationType'
-				})
-			];
-			const matchIndex = pipeline.findIndex((stage) => '$match' in stage);
-			if (matchIndex !== -1) {
-				pipeline.splice(matchIndex + 1, 0, ...lookupSlice);
-			}
-		}
+		const pipeline = getPipeline(colName, query, page, size);
 		const count = await col.countDocuments(query);
 		const data = await col.aggregate(pipeline).toArray();
 		return json({ page, size, count, data });

@@ -1,6 +1,6 @@
 import { DB_NAME } from '$env/static/private';
 import clientPromise from '$lib/db';
-import type { Abortable, Document, Filter, FindOneOptions, FindOptions } from 'mongodb';
+import type { Abortable, Document, Filter, FindOneOptions, FindOptions, OptionalId } from 'mongodb';
 
 export const Q = {
 	findOne: async (
@@ -17,6 +17,12 @@ export const Q = {
 		const client = await clientPromise;
 		const col = client.db(DB_NAME).collection(collection);
 		return await col.find(query, options).toArray();
+	},
+
+	insertOne: async (collection: string, doc: OptionalId<Document>) => {
+		const client = await clientPromise;
+		const col = client.db(DB_NAME).collection(collection);
+		return await col.insertOne(doc);
 	},
 
 	getCollection: async (collection: string) => {

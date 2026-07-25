@@ -1,4 +1,10 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+	GetObjectCommand,
+	PutObjectCommand,
+	S3Client,
+	type GetObjectCommandInput,
+	type PutObjectCommandInput
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getConfig } from './configs';
 import { BUCKET_ENDPOINT, BUCKET_NAME, BUCKET_REGION } from '$env/static/private';
@@ -25,8 +31,8 @@ async function getS3Client(): Promise<S3Client> {
 }
 
 interface IGetPresignedUploadUrlParams {
-	key: string;
-	contentType: string;
+	key: PutObjectCommandInput['Key'];
+	contentType: PutObjectCommandInput['ContentType'];
 	expiresIn?: number;
 	client?: S3Client;
 }
@@ -47,7 +53,7 @@ export async function getPresignedUploadUrl({
 }
 
 interface IGetPresignedUrlParams {
-	key: string;
+	key: GetObjectCommandInput['Key'];
 	expiresIn?: number;
 	client?: S3Client;
 }
@@ -63,4 +69,22 @@ export async function getPresignedUrl({
 	});
 	const s3Client = client ? client : await getS3Client();
 	return await getSignedUrl(s3Client, command, { expiresIn });
+}
+
+interface IPutObjectParams {
+	key: PutObjectCommandInput['Key'];
+	body: PutObjectCommandInput['Body'];
+	contentType: PutObjectCommandInput['ContentType'];
+	client?: S3Client;
+}
+
+export async function putObject({ key, body, contentType, client }: IPutObjectParams) {
+	const command = new PutObjectCommand({
+		Bucket: BUCKET_NAME,
+		Key: key,
+		Body: body,
+		ContentType: contentType
+	});
+	const s3Client = client ? client : await getS3Client();
+	return await s3Client.send(command);
 }

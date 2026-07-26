@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 
 		await Q.insertOne('exports', {
 			collection: colName,
-			key,
+			url: key,
 			fileName,
 			query,
 			format,

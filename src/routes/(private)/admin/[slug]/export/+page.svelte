@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { fillTemplate } from '$lib/client/common';
+	import CustomLayout from '$lib/components/admin/custom_layout.svelte';
 	import { tabManager } from '$lib/store/tabs.svelte';
 	import { toastManager } from '$lib/toast.svelte';
 	let loading = $state(false);
@@ -52,7 +53,7 @@
 	};
 </script>
 
-<div class="m-4 flex flex-col gap-6 p-4">
+<CustomLayout>
 	<div class="form-control gap-2">
 		<span class="text-sm font-semibold">Export Format</span>
 
@@ -118,4 +119,4 @@
 			{loading ? 'Exporting' : `Export (${format.toUpperCase()})`}
 		</button>
 	</div>
-</div>
+</CustomLayout>

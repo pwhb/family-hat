@@ -90,27 +90,31 @@ export const PATCH: RequestHandler = async ({ request, params, locals }) => {
 			appId: locals.user.appId
 		};
 
+		const update = {
+			...body,
+			updatedAt: new Date(),
+			updatedBy: locals.user._id
+		};
+
 		const data = await col.findOneAndUpdate(
 			{
 				...query,
 				_id: new ObjectId(params.id)
 			},
 			{
-				$set: {
-					...body,
-					updatedAt: new Date(),
-					updatedBy: locals.user._id
-				}
+				$set: update
 			}
 		);
 
-		const diff = getDocumentDiff(data, body);
+		const diff = getDocumentDiff(data, update);
 
 		await client.db(DB_NAME).collection(`history_${colName}`).insertOne({
 			refId: data?._id,
 			original: data,
-			update: body,
+			update: update,
 			diff,
+			action: 'update',
+			appId: locals.user.appId,
 			createdAt: new Date(),
 			createdBy: locals.user._id
 		});

@@ -1,9 +1,9 @@
 const ENDPOINTS = {
-	UPLOAD: '/api/uploads/avatars'
+	UPLOAD: '/api/uploads'
 };
 export const api = {
-	upload: async (file: Blob | File) => {
-		const res = await fetch(ENDPOINTS.UPLOAD, {
+	upload: async (file: Blob | File, path: string = 'assets') => {
+		const res = await fetch(`${ENDPOINTS.UPLOAD}?path=${path}`, {
 			headers: {
 				'Content-Type': file.type
 			}

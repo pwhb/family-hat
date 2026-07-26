@@ -96,7 +96,7 @@
 	});
 </script>
 
-<form {onsubmit} class="m-4 mt-0 fieldset rounded-box border border-base-300 bg-base-200 p-4">
+<form {onsubmit}>
 	<legend class="fieldset-legend text-xl capitalize">{mode} {getEntityName(slug)}</legend>
 	{#each page.data.pageConfig.fields as field}
 		<fieldset class="fieldset p-4">
@@ -165,6 +165,7 @@
 				/>
 			{:else if field.inputtype === 'upload'}
 				<Upload
+					path={field.path || page.params.slug}
 					bind:value={obj[field.key]}
 					name={field.name}
 					previewUrlKey={field.previewUrlKey}

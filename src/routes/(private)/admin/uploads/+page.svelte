@@ -8,10 +8,14 @@
 		previewUrl: string;
 	};
 	let uploads = $state<Upload[]>([]);
+	let path = $state('assets');
 </script>
 
 <div class="flex flex-col items-center justify-center gap-10">
+	<input bind:value={path} type="text" class="input" placeholder={'assets'} />
 	<Upload
+		{path}
+		accept={['*']}
 		callback={(res) => {
 			uploads.push(res);
 		}}

@@ -19,6 +19,10 @@ export function mergeDefaults<T extends Record<string, any>>(first: T, second?: 
 	return Object.fromEntries(Object.keys(first).map((key) => [key, second[key] || first[key]])) as T;
 }
 
+export function invertMapping(mapping: Record<string, string>): Record<string, string> {
+	return Object.fromEntries(Object.entries(mapping).map(([header, path]) => [path, header]));
+}
+
 export function buildMappedData(
 	data: any[],
 	mapping: Record<string, string>
@@ -92,7 +96,15 @@ export const getOptions = async ({
 };
 
 export function getDeepValue(path: string, source: any) {
-	return path.split('.').reduce((curr, key) => curr && curr[key], source);
+	if (!source || typeof source !== 'object') return undefined;
+
+	if (path in source) {
+		return source[path];
+	}
+
+	return path
+		.split('.')
+		.reduce((curr, key) => (curr && typeof curr === 'object' ? curr[key] : undefined), source);
 }
 
 export function buildEditableObj(fields: any[], dataSource: any) {

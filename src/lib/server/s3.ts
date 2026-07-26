@@ -71,6 +71,20 @@ export async function getPresignedUrl({
 	return await getSignedUrl(s3Client, command, { expiresIn });
 }
 
+interface IGetObjectParams {
+	key: PutObjectCommandInput['Key'];
+	client?: S3Client;
+}
+
+export async function getObject({ key, client }: IGetObjectParams) {
+	const command = new GetObjectCommand({
+		Bucket: BUCKET_NAME,
+		Key: key
+	});
+	const s3Client = client ? client : await getS3Client();
+	return await s3Client.send(command);
+}
+
 interface IPutObjectParams {
 	key: PutObjectCommandInput['Key'];
 	body: PutObjectCommandInput['Body'];

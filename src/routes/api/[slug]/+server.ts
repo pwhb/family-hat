@@ -1,12 +1,11 @@
 import { DB_NAME, MODE } from '$env/static/private';
-
 import clientPromise from '$lib/db';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { MongoServerError, type Document, type Filter } from 'mongodb';
+import { MongoServerError, type Filter } from 'mongodb';
 import { encrypt } from '$lib/server/crypto';
 import { COL_LIST } from '$lib/consts';
 import { hash } from 'argon2';
-import { createLookUpSlice, getPipeline } from '$lib/server/db';
+import { getPipeline } from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	try {
@@ -36,7 +35,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 							'name.my': { $regex: value, $options: 'i' }
 						}
 					];
-				} else if (['configs', 'users', 'pages'].includes(colName)) {
+				} else if (['configs', 'users', 'pages', 'menus', 'permissions'].includes(colName)) {
 					query['$or'] = [
 						{
 							name: { $regex: value, $options: 'i' }
@@ -97,7 +96,6 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 				query[key] = value;
 			}
 		}
-
 		const pipeline = getPipeline(colName, query, page, size);
 		const count = await col.countDocuments(query);
 		const data = await col.aggregate(pipeline).toArray();

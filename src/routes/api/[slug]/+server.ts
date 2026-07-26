@@ -5,7 +5,7 @@ import { MongoServerError, type Filter } from 'mongodb';
 import { encrypt } from '$lib/server/crypto';
 import { COL_LIST } from '$lib/consts';
 import { hash } from 'argon2';
-import { getPipeline } from '$lib/server/db';
+import { getPipeline, populatePayload } from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params, url, locals }) => {
 	try {
@@ -120,33 +120,10 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			return json({ message: 'Not Found' }, { status: 404 });
 		}
 		const col = client.db(DB_NAME).collection(colName);
-		if (colName === 'members') {
-			// members
-			body.code = body.name.en.replace(/\s/g, '_').toUpperCase();
-		} else if (['user_roles'].includes(colName)) {
-			body.code = body.name.replace(/\s/g, '_').toUpperCase();
-		} else if (colName === 'questions') {
-			// questions
-			if (body.options && body.options.length) {
-				for (const idx in body.options) {
-					body.options[idx].code = `${body.code}_${idx}`;
-				}
-			}
-		} else if (colName === 'relation_types') {
-			// relation types
-			body.code = `${body.sourceLabel.en.replace(/\s/g, '_').toUpperCase()}_${body.targetLabel.en.replace(/\s/g, '_').toUpperCase()}`;
-		} else if (colName === 'users') {
-			body.hashedPassword = await hash(body.password);
-			body.code = body.name.replace(/\s/g, '_').toUpperCase();
-			if (!body.username) body.username = body.code.toLowerCase();
-			delete body.password;
-		} else if (colName === 'configs' && body.type && body.type === 'secured') {
-			body.value = await encrypt(body.value);
-		}
-
+		const payload = await populatePayload(colName, body);
 		const data = await col.insertOne({
-			...body,
-			isActive: !!body.isActive,
+			...payload,
+			isActive: !!payload.isActive,
 			appId: locals.user.appId,
 			createdBy: locals.user._id,
 			createdAt: new Date(),

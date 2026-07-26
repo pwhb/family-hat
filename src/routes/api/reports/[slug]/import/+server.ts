@@ -1,6 +1,6 @@
 import { buildMappedData, invertMapping } from '$lib/client/common';
 import { COL_LIST } from '$lib/consts';
-import { Q } from '$lib/server/db';
+import { populatePayload, Q, unflatten } from '$lib/server/db';
 import { getDocumentDiff } from '$lib/server/diff';
 import { getObject } from '$lib/server/s3';
 import { json, type RequestHandler } from '@sveltejs/kit';
@@ -49,12 +49,33 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			if (!doc) {
 				return json({ message: 'Not found' }, { status: 404 });
 			}
-			const list = doc.json.map((v: Document) => ({
-				...v,
-				_id: v._id && ObjectId.isValid(v._id) ? new ObjectId(v._id) : v._id,
-				updatedAt: new Date(),
-				updatedBy: locals.user._id
-			}));
+
+			const list = await Promise.all(
+				doc.json.map(async (v: Document) => {
+					const id = v._id && ObjectId.isValid(v._id) ? new ObjectId(v._id) : v._id;
+					const { _id, ...cleanData } = v;
+					if (_id) {
+						return {
+							...cleanData,
+							_id: id,
+							updatedAt: new Date(),
+							updatedBy: locals.user._id
+						};
+					} else {
+						const populated = await populatePayload(colName, unflatten(cleanData));
+						return {
+							...populated,
+							_id: new ObjectId(),
+							isActive: !!v.isActive,
+							appId: locals.user.appId,
+							createdBy: locals.user._id,
+							createdAt: new Date(),
+							updatedAt: new Date()
+						};
+					}
+				})
+			);
+
 			const collection = await Q.getCollection(colName);
 			const originals = await collection
 				.find({
@@ -69,10 +90,10 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			});
 
 			const logs = list.map((v: Document) => {
-				const original = originalMap[v?._id.toString()];
+				const original = v._id ? originalMap[v._id.toString()] : null;
 				return original
 					? {
-							refId: v?._id,
+							refId: v._id,
 							original: original,
 							update: v,
 							diff: getDocumentDiff(original, v),
@@ -83,7 +104,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 							createdBy: locals.user._id
 						}
 					: {
-							refId: v?._id,
+							refId: null,
 							update: v,
 							action: 'batch_create',
 							batchId: doc._id,
@@ -102,7 +123,8 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 							$set: {
 								...update
 							}
-						}
+						},
+						upsert: true
 					}
 				};
 			});

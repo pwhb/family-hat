@@ -1,5 +1,6 @@
 import { DB_NAME } from '$env/static/private';
 import clientPromise from '$lib/db';
+import { hash } from 'argon2';
 import type {
 	Abortable,
 	Document,
@@ -9,6 +10,7 @@ import type {
 	InsertOneOptions,
 	OptionalId
 } from 'mongodb';
+import { encrypt } from './crypto';
 
 export const Q = {
 	findOne: async (
@@ -208,4 +210,68 @@ export const getPipeline = (colName: string, query: Filter<any>, page?: number, 
 		);
 	}
 	return pipeline;
+};
+
+/**
+ * Converts flat dot-notation paths ({ "name.en": "a", "name.my": "b" })
+ * into nested objects ({ name: { en: "a", my: "b" } }).
+ */
+export function unflatten<T extends Record<string, any> = Record<string, any>>(
+	flatObj: Record<string, any>
+): T {
+	const result: Record<string, any> = {};
+
+	for (const path in flatObj) {
+		if (!Object.prototype.hasOwnProperty.call(flatObj, path)) continue;
+
+		const value = flatObj[path];
+
+		if (value === undefined) continue;
+
+		if (!path.includes('.')) {
+			result[path] = value;
+			continue;
+		}
+
+		const keys = path.split('.');
+		let current = result;
+
+		for (let i = 0; i < keys.length - 1; i++) {
+			const key = keys[i];
+
+			if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
+				current[key] = {};
+			}
+
+			current = current[key];
+		}
+
+		current[keys[keys.length - 1]] = value;
+	}
+
+	return result as T;
+}
+
+export const populatePayload = async (colName: string, body: any) => {
+	if (colName === 'members') {
+		body.code = body.name.en.replace(/\s/g, '_').toUpperCase();
+	} else if (['user_roles'].includes(colName)) {
+		body.code = body.name.replace(/\s/g, '_').toUpperCase();
+	} else if (colName === 'questions') {
+		if (body.options && body.options.length) {
+			for (const idx in body.options) {
+				body.options[idx].code = `${body.code}_${idx}`;
+			}
+		}
+	} else if (colName === 'relation_types') {
+		body.code = `${body.sourceLabel.en.replace(/\s/g, '_').toUpperCase()}_${body.targetLabel.en.replace(/\s/g, '_').toUpperCase()}`;
+	} else if (colName === 'users') {
+		body.hashedPassword = await hash(body.password);
+		body.code = body.name.replace(/\s/g, '_').toUpperCase();
+		if (!body.username) body.username = body.code.toLowerCase();
+		delete body.password;
+	} else if (colName === 'configs' && body.type && body.type === 'secured') {
+		body.value = await encrypt(body.value);
+	}
+	return body;
 };

@@ -30,6 +30,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			});
 
 			const { mapping } = locals.apiConfig;
+
 			const mapped = buildMappedData(jsonRecords, invertMapping(mapping));
 			const created = await Q.insertOne('imports', {
 				url,
@@ -45,7 +46,8 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 			const data = await Q.findOne('imports', { _id: created.insertedId });
 			return json({ data });
 		} else if (action === 'commit') {
-			const doc = await Q.findOne('imports', { _id: new ObjectId(_id) });
+			const importCol = await Q.getCollection('imports');
+			const doc = await importCol.findOne({ _id: new ObjectId(_id) });
 			if (!doc) {
 				return json({ message: 'Not found' }, { status: 404 });
 			}
@@ -91,47 +93,85 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 
 			const logs = list.map((v: Document) => {
 				const original = v._id ? originalMap[v._id.toString()] : null;
-				return original
-					? {
-							refId: v._id,
-							original: original,
-							update: v,
-							diff: getDocumentDiff(original, v),
-							action: 'batch_update',
-							batchId: doc._id,
-							appId: locals.user.appId,
-							createdAt: new Date(),
-							createdBy: locals.user._id
-						}
-					: {
-							refId: null,
-							update: v,
-							action: 'batch_create',
-							batchId: doc._id,
-							appId: locals.user.appId,
-							createdAt: new Date(),
-							createdBy: locals.user._id
-						};
+
+				const diff = original ? getDocumentDiff(original, v) : {};
+
+				const meaningfulDiffKeys = Object.keys(diff).filter(
+					(key) => key !== 'updatedAt' && key !== 'updatedBy'
+				);
+
+				const hasChanges = !original || meaningfulDiffKeys.length > 0;
+
+				return {
+					hasChanges,
+					logEntry: original
+						? {
+								refId: v._id,
+								original,
+								update: v,
+								diff,
+								action: 'batch_update',
+								batchId: doc._id,
+								appId: locals.user.appId,
+								createdAt: new Date(),
+								createdBy: locals.user._id
+							}
+						: {
+								refId: v._id,
+								update: v,
+								action: 'batch_create',
+								batchId: doc._id,
+								appId: locals.user.appId,
+								createdAt: new Date(),
+								createdBy: locals.user._id
+							}
+				};
 			});
-			const operations = list.map((v: Document) => {
+
+			const activeEntries = logs.filter((entry) => entry.hasChanges);
+
+			if (activeEntries.length === 0) {
+				return json({
+					data: { matchedCount: 0, modifiedCount: 0, upsertedCount: 0, skippedCount: list.length }
+				});
+			}
+
+			const filteredLogs = activeEntries.map((e) => e.logEntry);
+			const filteredList = activeEntries.map((e) => e.logEntry.update);
+
+			const operations = filteredList.map((v: Document) => {
 				const { _id, ...update } = v;
 				const id = _id && ObjectId.isValid(_id) ? new ObjectId(_id) : _id;
 				return {
 					updateOne: {
 						filter: { _id: id },
 						update: {
-							$set: {
-								...update
-							}
+							$set: { ...update }
 						},
 						upsert: true
 					}
 				};
 			});
+
 			const data = await collection.bulkWrite(operations);
 			const historyCol = await Q.getCollection(`history_${colName}`);
-			await historyCol.insertMany(logs);
-			return json({ data });
+			await historyCol.insertMany(filteredLogs);
+			await importCol.findOneAndUpdate(
+				{ _id: new ObjectId(_id) },
+				{
+					$set: {
+						updatedAt: new Date(),
+						updatedBy: locals.user._id,
+						status: 'done',
+						skippedCount: list.length - filteredList.length
+					}
+				}
+			);
+			return json({
+				data: {
+					...data
+				}
+			});
 		}
 		return json({ message: 'Action not allowed.' }, { status: 400 });
 	} catch (error) {

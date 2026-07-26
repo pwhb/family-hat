@@ -15,7 +15,7 @@ export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve
 export function getCleanPath(
 	pathname: string,
 	routeId: string | null,
-	preserve = ['slug']
+	preserve = ['slug', 'title']
 ): string {
 	if (!routeId) return pathname;
 

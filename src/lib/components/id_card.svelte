@@ -11,6 +11,7 @@
 			[key: string]: LocalizedText;
 		};
 		gender?: string;
+		status?: string;
 		avatarUrl?: string;
 		previewUrl?: string;
 	}
@@ -36,7 +37,7 @@
 					container:
 						'card relative w-80 overflow-hidden rounded-4xl rounded-tr-lg rounded-bl-lg border border-base-300 bg-base-100 shadow-xl',
 					name: 'card-title justify-center text-xl font-extrabold tracking-tight text-base-content',
-					title: 'text-sm font-semibold tracking-wide text-primary/80 uppercase',
+					title: 'text-sm font-semibold tracking-wide text-primary/80 uppercase mb-2',
 					onPath: `text-sm font-semibold tracking-wide uppercase underline decoration-6 underline-offset-8`
 				};
 			default:
@@ -49,6 +50,17 @@
 				};
 		}
 	};
+	const getBadgeClass = (status: string) => {
+		switch (status) {
+			case 'AWAY':
+				return 'badge badge-error text-base-100 text-[0.625rem]';
+			case 'HOME':
+				return 'badge badge-success text-base-100 text-[0.625rem]';
+			case 'HOME':
+				return 'badge badge-warning text-base-100 text-[0.625rem]';
+		}
+	};
+	const { config } = page.data;
 </script>
 
 {#if member && family}
@@ -70,7 +82,7 @@
 						class="h-24 w-24 rounded-3xl rounded-tl-sm rounded-br-sm bg-gray-200 p-2 text-neutral-content shadow-md"
 					>
 						<img
-							src={page.data.config.avatarPlaceholder[
+							src={config.avatarPlaceholder[
 								member.gender ? member.gender.toLowerCase() : 'neutral'
 							]}
 							alt={member.name[lang.value]}
@@ -81,7 +93,7 @@
 
 			<div class="space-y-1">
 				{#if type === 'full'}
-					<span class={getCustomClass().title}>{member.aliases.title[lang.value]}</span>
+					<p class={getCustomClass().title}>{member.aliases.title[lang.value]}</p>
 				{/if}
 				<h2
 					class={`${focus && focus === member._id ? 'text-accent underline' : ''} ${getCustomClass().name}`}
@@ -109,7 +121,7 @@
 				<div class="flex w-full items-center justify-between px-2 text-left">
 					<div>
 						<span class="block text-[10px] font-bold tracking-widest uppercase opacity-40"
-							>House</span
+							>{config.lang['HOUSE'][lang.value]}</span
 						>
 						<span class="text-sm font-bold text-base-content/90">{family.fullName[lang.value]}</span
 						>
@@ -117,10 +129,11 @@
 
 					<div>
 						<span class="block text-[10px] font-bold tracking-widest uppercase opacity-40"
-							>House</span
+							>{config.lang['STATUS'][lang.value]}</span
 						>
-						<span class="text-sm font-bold text-base-content/90">{family.fullName[lang.value]}</span
-						>
+						<span class={getBadgeClass(member.status || 'AWAY')}>
+							{member.status && config.statusMap[member.status][lang.value]}
+						</span>
 					</div>
 
 					<div class="flex flex-col items-end opacity-30 transition-opacity group-hover:opacity-50">

@@ -14,6 +14,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		.aggregate([
 			{
 				$match: {
+					...privateConfigs.query.members.match,
 					$or: [
 						{
 							sourceID: params.id

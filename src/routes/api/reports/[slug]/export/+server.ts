@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 		const col = await Q.getCollection(colName);
 		const query: Filter<any> = {
 			...locals.query,
-			appId: locals.user.appId
+			appID: locals.user.appID
 		};
 		const count = await col.countDocuments(query);
 		const pipeline = getPipeline(colName, query);

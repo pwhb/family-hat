@@ -62,7 +62,7 @@
 						<span class="text-xs font-semibold text-base-content/50 capitalize"
 							>Application Scope</span
 						>
-						<span class="mt-1 text-sm font-semibold text-base-content/90">{user.appId}</span>
+						<span class="mt-1 text-sm font-semibold text-base-content/90">{user.appID}</span>
 					</div>
 
 					<div

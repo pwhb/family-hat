@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import HistoricalCard from '$lib/components/historical_card.svelte';
 	import Hover3d from '$lib/components/hover3d.svelte';
 	import IdCard from '$lib/components/id_card.svelte';
 	import InterFamilyTreeGroup from '$lib/components/inter_family_tree_group.svelte';
@@ -8,11 +9,21 @@
 
 <div class="my-10 flex items-center justify-center">
 	<Hover3d>
-		<IdCard
-			member={page.data.pageData.member}
-			family={page.data.pageData.families[0].family}
-			type="full"
-		/>
+		{#if page.data.pageConfig.cardView}
+			{#if page.data.pageConfig.cardView === 'HistoricalCard'}
+				<HistoricalCard
+					member={page.data.pageData.member}
+					family={page.data.pageData.families[0].family}
+					type="full"
+				/>
+			{/if}
+		{:else}
+			<IdCard
+				member={page.data.pageData.member}
+				family={page.data.pageData.families[0].family}
+				type="full"
+			/>
+		{/if}
 	</Hover3d>
 </div>
 

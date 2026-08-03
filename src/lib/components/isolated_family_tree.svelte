@@ -2,6 +2,8 @@
 	import Hover3d from './hover3d.svelte';
 	import IdCard from './id_card.svelte';
 	import { lang } from '$lib/store/lang.svelte';
+	import { page } from '$app/state';
+	import HistoricalCard from './historical_card.svelte';
 
 	interface Props {
 		item: any;
@@ -40,17 +42,24 @@
 			<div class="flex w-max items-start justify-center gap-6">
 				{#each members as member}
 					<!-- Mutation updates parent's global location lookup dictionary instantaneously -->
-					<a
-						bind:this={elRefs[member._id]}
-						href={`/tree/members/${member._id}`}
-						class="block"
-						onpointerenter={() => onCardHover(true)}
-						onpointerleave={() => onCardHover(false)}
-					>
-						<Hover3d>
-							<IdCard {member} family={item.family} {focus} />
-						</Hover3d>
-					</a>
+
+					{#if page.data.pageConfig.cardView}
+						{#if page.data.pageConfig.cardView === 'HistoricalCard'}
+							<HistoricalCard {member} family={item.family} {focus} />
+						{/if}
+					{:else}
+						<a
+							bind:this={elRefs[member._id]}
+							href={`/tree/members/${member._id}`}
+							class="block"
+							onpointerenter={() => onCardHover(true)}
+							onpointerleave={() => onCardHover(false)}
+						>
+							<Hover3d>
+								<IdCard {member} family={item.family} {focus} />
+							</Hover3d>
+						</a>
+					{/if}
 				{/each}
 			</div>
 		{/each}

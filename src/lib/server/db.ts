@@ -138,7 +138,7 @@ export const getPipeline = (colName: string, query: Filter<any>, page?: number, 
 		},
 		{
 			$project: {
-				appId: 0,
+				appID: 0,
 				hashedPassword: 0
 			}
 		},

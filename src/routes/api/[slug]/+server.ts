@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		const size = Number(url.searchParams.get('size'));
 		const query: Filter<any> = {
 			...locals.query,
-			appId: locals.user.appId
+			appID: locals.user.appID
 		};
 		for (let [key, value] of url.searchParams) {
 			if (key === 'q') {
@@ -124,7 +124,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 		const data = await col.insertOne({
 			...payload,
 			isActive: !!payload.isActive,
-			appId: locals.user.appId,
+			appID: locals.user.appID,
 			createdBy: locals.user._id,
 			createdAt: new Date(),
 			updatedAt: new Date()

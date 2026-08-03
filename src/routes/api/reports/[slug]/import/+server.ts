@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 				status: 'pending',
 				json: mapped,
 				count: mapped.length,
-				appId: locals.user.appId,
+				appID: locals.user.appID,
 				createdBy: locals.user._id,
 				createdAt: new Date(),
 				updatedAt: new Date()
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 							...populated,
 							_id: new ObjectId(),
 							isActive: !!v.isActive,
-							appId: locals.user.appId,
+							appID: locals.user.appID,
 							createdBy: locals.user._id,
 							createdAt: new Date(),
 							updatedAt: new Date()
@@ -112,7 +112,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 								diff,
 								action: 'batch_update',
 								batchId: doc._id,
-								appId: locals.user.appId,
+								appID: locals.user.appID,
 								createdAt: new Date(),
 								createdBy: locals.user._id
 							}
@@ -121,7 +121,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 								update: v,
 								action: 'batch_create',
 								batchId: doc._id,
-								appId: locals.user.appId,
+								appID: locals.user.appID,
 								createdAt: new Date(),
 								createdBy: locals.user._id
 							}

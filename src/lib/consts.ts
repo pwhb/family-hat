@@ -26,7 +26,9 @@ export const COL_LIST = [
 	'menus',
 	'permissions',
 	'user_roles',
-	'payments'
+	'question_sets',
+	'question_steps',
+	'user_progressions'
 ];
 
 export const ADMIN_TOKEN = 'admin_token';
